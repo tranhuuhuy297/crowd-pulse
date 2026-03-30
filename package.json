@@ -1,0 +1,16 @@
+{
+  "name": "contrarian-thinking",
+  "private": true,
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev:api": "bun --filter @crowdpulse/api dev",
+    "dev:web": "bun --filter @crowdpulse/web dev",
+    "dev:all": "bun run dev:api & bun run dev:web",
+    "db:generate": "bun --filter @crowdpulse/api db:generate",
+    "db:push": "bun --filter @crowdpulse/api db:push",
+    "db:studio": "bun --filter @crowdpulse/api db:studio"
+  },
+  "devDependencies": {
+    "pino-pretty": "^13.1.3"
+  }
+}
