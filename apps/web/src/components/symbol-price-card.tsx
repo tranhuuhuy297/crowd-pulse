@@ -1,4 +1,4 @@
-import type { PriceSnapshot } from "@crowdpulse/shared";
+import type { PriceSnapshot } from "../lib/types";
 import { formatPrice, formatPercent } from "../lib/number-format-utils";
 
 interface SymbolPriceCardProps {
@@ -16,7 +16,7 @@ function getRsiColor(rsi: number | null): string {
 
 /** Compact card showing symbol price, 1h change, and RSI indicator */
 export function SymbolPriceCard({ symbol, snapshot }: SymbolPriceCardProps) {
-  const { price, change1h, rsi } = snapshot;
+  const { price, change24hPct: change1h, rsi } = snapshot;
   const isPositive = change1h !== null && change1h >= 0;
   const rsiColor = getRsiColor(rsi);
 
@@ -39,10 +39,10 @@ export function SymbolPriceCard({ symbol, snapshot }: SymbolPriceCardProps) {
             <span className={`text-sm font-medium ${isPositive ? "text-green-400" : "text-red-400"}`}>
               {isPositive ? "▲" : "▼"} {formatPercent(change1h)}
             </span>
-            <span className="text-xs text-gray-600">1h</span>
+            <span className="text-xs text-gray-600">24h</span>
           </>
         ) : (
-          <span className="text-xs text-gray-600">No 1h data</span>
+          <span className="text-xs text-gray-600">No 24h data</span>
         )}
       </div>
     </div>

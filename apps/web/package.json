@@ -7,7 +7,6 @@
     "preview": "bunx vite preview"
   },
   "dependencies": {
-    "@crowdpulse/shared": "workspace:*",
     "lucide-react": "^1.7.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

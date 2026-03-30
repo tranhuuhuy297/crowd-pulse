@@ -1,4 +1,4 @@
-import type { SignalType } from "@crowdpulse/shared";
+import type { SignalType } from "../lib/types";
 import { SvgGaugeChart } from "./svg-gauge-chart";
 
 interface CrowdPulseScoreCardProps {

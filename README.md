@@ -2,9 +2,11 @@
 
 Crypto crowd sentiment analysis tool based on contrarian trading principles. When the crowd is too bullish, prepare to sell. When too bearish, prepare to buy.
 
+**Live:** [https://tranhuuhuy297.github.io/crowd-pulse/](https://tranhuuhuy297.github.io/crowd-pulse/)
+
 ## How It Works
 
-CrowdPulse aggregates data from multiple sources and computes a **Crowd Pulse Score (0-100)**:
+CrowdPulse fetches data from free public APIs directly in your browser and computes a **Crowd Pulse Score (0-100)**:
 
 | Score Range | Crowd Mood | Contrarian Signal |
 |-------------|------------|-------------------|
@@ -14,144 +16,72 @@ CrowdPulse aggregates data from multiple sources and computes a **Crowd Pulse Sc
 | 20-34 | Fear | BUY |
 | 0-19 | Extreme Fear | STRONG_BUY |
 
-### Data Sources (Phase 1)
-
-- **Binance** — OHLCV price data for BTC, ETH, SOL, BNB (every 60s)
-- **Fear & Greed Index** — alternative.me API (every 1h, backfills 30 days)
-
-### Crowd Pulse Score Formula
+### Score Formula
 
 ```
-score = fearGreed × 0.4 + avgRSI × 0.3 + volumeAnomaly × 0.3
+score = fearGreed × 0.35 + avgRSI × 0.25 + volumeAnomaly × 0.20 + longShortRatio × 0.20
 ```
 
-Weights redistribute automatically when data sources are unavailable.
+Weights auto-redistribute when data sources are unavailable.
+
+### Data Sources (all free, no API keys)
+
+| Source | Data | Refresh |
+|--------|------|---------|
+| [alternative.me](https://alternative.me/crypto/fear-and-greed-index/) | Fear & Greed Index (0-100) | 60s |
+| [Binance Spot API](https://api.binance.com) | Price, 24h change, volume for BTC/ETH/SOL/BNB | 60s |
+| [Binance Spot Klines](https://api.binance.com) | 50 hourly candles → RSI-14 + volume anomaly | 60s |
+| [Binance Futures API](https://fapi.binance.com) | Global long/short account ratio | 60s |
 
 ## Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
-| Runtime | Bun.js |
-| Backend | Hono.js + TypeScript (strict) |
-| Database | PostgreSQL + Drizzle ORM |
-| Queue | Redis + BullMQ |
-| Frontend | React 19 + Vite + TailwindCSS v4 |
-| Monorepo | Bun workspaces |
+| Frontend | React 19 + TypeScript |
+| Build | Vite 6 |
+| Styling | TailwindCSS v4 |
+| Deploy | GitHub Pages via GitHub Actions |
+
+**No backend, no database, no API keys.** Everything runs client-side.
+
+## Quick Start
+
+```bash
+bun install
+cd apps/web && bun run dev
+```
+
+Open [http://localhost:5177](http://localhost:5177).
+
+## Deployment
+
+Push to `main` triggers automatic deployment to GitHub Pages via GitHub Actions.
+
+Manual deploy:
+```bash
+cd apps/web && bun run build
+# Output in apps/web/dist/
+```
 
 ## Project Structure
 
 ```
-apps/
-  api/                  # Hono.js backend (port 3001)
-    src/
-      db/schema/        # Drizzle ORM table definitions
-      jobs/             # BullMQ workers (price crawler, fear & greed crawler)
-      routes/           # API route handlers
-      services/         # Business logic (score calculator, data fetchers)
-      lib/              # Utilities (logger)
-  web/                  # React frontend (port 5173)
-    src/
-      components/       # Dashboard UI components
-      hooks/            # Custom React hooks
-      lib/              # API client, formatting utilities
-packages/
-  shared/               # Shared types, constants, Zod schemas
+apps/web/src/
+  lib/
+    api/                              # Browser-callable API fetchers
+      fear-greed-index-fetcher.ts
+      binance-spot-price-and-klines-fetcher.ts
+      binance-futures-long-short-ratio-fetcher.ts
+    crowd-pulse-score-calculator.ts   # Client-side score calculation
+    rsi-wilder-smoothing-calculator.ts
+    constants.ts                      # Tracked symbols, API URLs
+    types.ts                          # TypeScript interfaces
+  hooks/
+    use-crowd-pulse-client-side-data.ts  # Main data hook (fetch + calculate)
+  components/
+    crowd-pulse-score-card.tsx        # Gauge + signal badge
+    fear-greed-display-card.tsx       # Fear & Greed index card
+    liquidation-ratio-display-card.tsx # Long/short ratio card
+    symbol-price-grid.tsx             # Price cards grid
+    svg-gauge-chart.tsx               # Score gauge visualization
 ```
-
-## Quick Start
-
-### Prerequisites
-
-- [Bun](https://bun.sh) >= 1.0
-- [Docker](https://docker.com) (for Postgres + Redis)
-- Or local PostgreSQL + Redis
-
-### Setup
-
-```bash
-# Install dependencies
-make install
-
-# Start Postgres + Redis
-make up
-
-# Push database schema
-make db-push
-
-# Start API + frontend
-make dev
-```
-
-The API runs on `http://localhost:4177` and the frontend on `http://localhost:5177`.
-
-### Using Local PostgreSQL
-
-If you have a local PostgreSQL instead of Docker, update `.env`:
-
-```
-DATABASE_URL=postgresql://youruser@localhost:5432/crowdpulse
-```
-
-Then create the database:
-
-```bash
-psql -d postgres -c "CREATE DATABASE crowdpulse;"
-make db-push
-```
-
-## Available Commands
-
-```
-make help         # Show all commands
-make dev          # Start everything (Docker + API + Web)
-make dev-api      # Start API only
-make dev-web      # Start frontend only
-make db-push      # Push schema to database
-make db-studio    # Open Drizzle Studio (DB browser)
-make check        # Type-check all packages
-make build        # Build frontend for production
-make health       # Check API health
-make dashboard    # Fetch dashboard data
-make psql         # Open psql shell
-make clean        # Remove build artifacts
-make reset-db     # Drop and recreate database
-```
-
-## API Endpoints
-
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/api/health` | Health check |
-| GET | `/api/dashboard` | Crowd Pulse Score + all components |
-
-### Dashboard Response
-
-```json
-{
-  "crowdPulse": { "score": 42.5, "signal": "NEUTRAL", "updatedAt": "..." },
-  "components": {
-    "fearGreed": { "value": 55, "classification": "Greed", "change24h": 3 },
-    "rsi": { "avg": 58.2, "bySymbol": { "BTC": 62, "ETH": 55 } },
-    "volume": { "avgChangePct": 12.5, "normalized": 62.5 }
-  },
-  "signals": [],
-  "prices": { "BTC": { "price": 67000, "change1h": 0.5, "rsi": 62 } }
-}
-```
-
-## Environment Variables
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `DATABASE_URL` | `postgresql://postgres:postgres@localhost:5432/crowdpulse` | PostgreSQL connection |
-| `REDIS_URL` | `redis://localhost:6379` | Redis connection |
-| `API_PORT` | `4177` | API server port |
-
-## Roadmap
-
-- [x] Phase 1: Monorepo, price crawler, fear & greed, dashboard API, frontend skeleton
-- [ ] Phase 2: Twitter + Reddit sentiment crawlers
-- [ ] Phase 3: Google Trends, liquidation data, on-chain metrics
-- [ ] Phase 4: Contrarian signal generator + historical accuracy tracking
-- [ ] Phase 5: Real-time SSE, alerts, Telegram bot
-- [ ] Phase 6: Docker production setup, GCP Cloud Run deploy, CI/CD
