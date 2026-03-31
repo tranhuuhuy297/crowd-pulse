@@ -1,5 +1,5 @@
 import { useRef, useEffect } from "react";
-import type { PriceSnapshot } from "../lib/types";
+import type { PriceSnapshot, BuyConclusionData } from "../lib/types";
 import { formatPrice, formatPercent } from "../lib/number-format-utils";
 
 interface SymbolPriceGridProps {
@@ -8,6 +8,8 @@ interface SymbolPriceGridProps {
   selectedAsset: string;
   /** Called when user clicks a different asset */
   onAssetChange: (displayName: string) => void;
+  /** Buy recommendation per asset display name (e.g. { BTC: "BUY_NOW", ETH: "AVOID" }) */
+  buyRecommendations?: Record<string, BuyConclusionData["recommendation"]>;
 }
 
 /** Brand colors per asset for the glow/accent effect */
@@ -125,15 +127,25 @@ function AnimatedPrice({ price, className }: { price: number; className?: string
 
 /* ─── Asset Pill (clickable mini-ticker) ──────────────────────── */
 
-function AssetPill({ displayName, price, isActive, onClick }: {
+/** Short labels for pill chips */
+const BUY_CHIP_SHORT: Record<BuyConclusionData["recommendation"], { label: string; color: string }> = {
+  BUY_NOW: { label: "Buy", color: "rgb(34, 197, 94)" },
+  WAIT_FOR_DIP: { label: "Wait", color: "rgb(245, 158, 11)" },
+  HOLD_OFF: { label: "Hold", color: "rgb(163, 163, 163)" },
+  AVOID: { label: "Avoid", color: "rgb(239, 68, 68)" },
+};
+
+function AssetPill({ displayName, price, isActive, onClick, recommendation }: {
   displayName: string;
   price: PriceSnapshot;
   isActive: boolean;
   onClick: () => void;
+  recommendation?: BuyConclusionData["recommendation"];
 }) {
   const color = ASSET_COLORS[displayName] ?? "var(--text-muted)";
   const IconComponent = ASSET_ICONS[displayName] ?? DefaultIcon;
   const isPositive = price.change24hPct >= 0;
+  const chip = recommendation ? BUY_CHIP_SHORT[recommendation] : null;
 
   return (
     <button
@@ -154,9 +166,19 @@ function AssetPill({ displayName, price, isActive, onClick }: {
     >
       <IconComponent className="w-6 h-6" />
       <div className="flex flex-col items-start">
-        <span className="text-xs font-bold leading-tight" style={{ color: isActive ? color : "var(--text-primary)" }}>
-          {displayName}
-        </span>
+        <div className="flex items-center gap-1">
+          <span className="text-xs font-bold leading-tight" style={{ color: isActive ? color : "var(--text-primary)" }}>
+            {displayName}
+          </span>
+          {chip && (
+            <span
+              className="text-[9px] font-semibold leading-none px-1 py-0.5 rounded"
+              style={{ color: chip.color, background: `${chip.color}20` }}
+            >
+              {chip.label}
+            </span>
+          )}
+        </div>
         <span className={`text-xs leading-tight ${isPositive ? "text-green-500" : "text-red-500"}`}>
           {isPositive ? "+" : ""}{price.change24hPct.toFixed(1)}%
         </span>
@@ -168,7 +190,7 @@ function AssetPill({ displayName, price, isActive, onClick }: {
 /* ─── Main Component ──────────────────────────────────────────── */
 
 /** Interactive price card with built-in asset switcher pills and animated hero price */
-export function SymbolPriceGrid({ prices, selectedAsset, onAssetChange }: SymbolPriceGridProps) {
+export function SymbolPriceGrid({ prices, selectedAsset, onAssetChange, buyRecommendations }: SymbolPriceGridProps) {
   if (prices.length === 0) {
     return (
       <p className="text-sm text-center py-4" style={{ color: "var(--text-muted)" }}>No price data available</p>
@@ -233,6 +255,7 @@ export function SymbolPriceGrid({ prices, selectedAsset, onAssetChange }: Symbol
               price={p}
               isActive={dn === selectedAsset}
               onClick={() => onAssetChange(dn)}
+              recommendation={buyRecommendations?.[dn]}
             />
           );
         })}

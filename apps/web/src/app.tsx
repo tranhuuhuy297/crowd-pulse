@@ -96,6 +96,11 @@ function AssetDashboard() {
                   prices={data.prices}
                   selectedAsset={displayName}
                   onAssetChange={(dn) => navigate(`/${dn.toLowerCase()}`)}
+                  buyRecommendations={Object.fromEntries(
+                    Object.entries(data.assets)
+                      .filter(([, a]) => a.buyConclusion)
+                      .map(([key, a]) => [key, a.buyConclusion!.recommendation])
+                  )}
                 />
               </DashboardCard>
               {assetData.buyConclusion && (
