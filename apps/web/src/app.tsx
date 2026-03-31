@@ -20,7 +20,7 @@ function healthDotColor(health: DataSourceHealth): string {
 
 function failedSources(health: DataSourceHealth): string[] {
   const names: string[] = [];
-  if (!health.fearGreed) names.push("Fear & Greed");
+  if (!health.fearGreed) names.push("Market Sentiment");
   if (!health.prices) names.push("Spot Prices");
   if (!health.klines) names.push("Klines/RSI");
   if (!health.longShort) names.push("Long/Short");

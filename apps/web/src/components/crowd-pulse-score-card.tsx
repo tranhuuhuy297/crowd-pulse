@@ -44,8 +44,8 @@ export function CrowdPulseScoreCard({ score, signal, components, scoreDelta }: C
     <div className="relative rounded-xl p-4 flex flex-col items-center gap-2 backdrop-blur-sm overflow-visible hover:z-20 focus-within:z-20" style={{ background: "var(--bg-card)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--bg-card-border)" }}>
       <div className="flex items-center justify-between w-full">
         <h2 className="text-xs font-semibold uppercase tracking-wider flex items-center gap-1" style={{ color: "var(--text-muted)" }}>
-          Crowd Pulse
-          <InfoTooltip content="Sentiment score 0-100. F&G 35% + RSI 25% + Vol 20% + L/S 20%." />
+          Contrarian Signal
+          <InfoTooltip content="Composite score 0-100. Blends Market Sentiment, RSI, Volume & L/S Ratio." />
         </h2>
         <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${style.badge}`}>
           {style.label}

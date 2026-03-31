@@ -34,8 +34,8 @@ export function FearGreedDisplayCard({ value, classification, change24h }: FearG
   return (
     <div className="relative rounded-xl p-4 flex flex-col gap-2 backdrop-blur-sm overflow-visible hover:z-20 focus-within:z-20" style={{ background: "var(--bg-card)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--bg-card-border)" }}>
       <h2 className="text-xs font-semibold uppercase tracking-wider flex items-center gap-1" style={{ color: "var(--text-muted)" }}>
-        Fear & Greed
-        <InfoTooltip content="Market sentiment 0-100. 0 = Extreme Fear, 100 = Extreme Greed." />
+        Market Sentiment
+        <InfoTooltip content="alternative.me Fear & Greed Index. One of 4 inputs to Contrarian Signal." />
       </h2>
 
       <div className="flex items-end justify-between">

@@ -3,7 +3,7 @@ import { InfoTooltip } from "./info-tooltip";
 
 /** Config for each score component: label, weight, color, and value extractor */
 const COMPONENT_CONFIG = [
-  { key: "fearGreed", label: "Fear & Greed", weight: 35, color: "bg-amber-500", tooltip: "F&G Index (0-100). 35% weight." },
+  { key: "fearGreed", label: "Mkt Sentiment", weight: 35, color: "bg-amber-500", tooltip: "alternative.me Fear & Greed Index (0-100). 35% weight." },
   { key: "avgRsi", label: "RSI", weight: 25, color: "bg-neutral-400", tooltip: "Avg RSI across symbols. 25% weight." },
   { key: "volumeAnomaly", label: "Volume", weight: 20, color: "bg-neutral-500", tooltip: "Current vs avg volume. 20% weight." },
   { key: "longShortRatio", label: "L/S Ratio", weight: 20, color: "bg-amber-400", tooltip: "Long/short ratio (0-100). 20% weight." },

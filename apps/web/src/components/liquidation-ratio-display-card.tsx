@@ -58,7 +58,7 @@ export function LiquidationRatioDisplayCard({ longShort, className = "" }: Props
   const bias = biasLabel(avg);
 
   return (
-    <div className={`relative rounded-xl p-4 flex flex-col gap-2 backdrop-blur-sm overflow-visible hover:z-20 focus-within:z-20 ${className}`} style={{ background: "var(--bg-card)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--bg-card-border)" }}>
+    <div className={`relative rounded-xl p-4 flex flex-col gap-3 backdrop-blur-sm overflow-visible hover:z-20 focus-within:z-20 ${className}`} style={{ background: "var(--bg-card)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--bg-card-border)" }}>
       <div className="flex items-center justify-between">
         <h3 className="text-xs font-semibold uppercase tracking-wider flex items-center gap-1" style={{ color: "var(--text-muted)" }}>
           Long/Short Ratio
@@ -69,19 +69,24 @@ export function LiquidationRatioDisplayCard({ longShort, className = "" }: Props
         </span>
       </div>
 
+      {/* Hero ratio number */}
+      <div className="text-2xl font-bold tracking-tight" style={{ color: "var(--text-primary)" }}>
+        {avg.toFixed(2)}
+      </div>
+
       {/* Stacked long/short bar */}
-      <div className="flex h-4 rounded-full overflow-hidden text-xs font-semibold">
+      <div className="flex h-7 rounded-full overflow-hidden text-xs font-bold">
         <div
-          className="bg-green-500/80 flex items-center justify-center text-white/90 transition-all duration-500"
-          style={{ width: `${Math.max(longPct, 8)}%` }}
+          className="bg-green-500 flex items-center justify-center text-white transition-all duration-500"
+          style={{ width: `${Math.max(longPct, 12)}%` }}
         >
-          {longPct.toFixed(0)}%
+          {longPct.toFixed(0)}% L
         </div>
         <div
-          className="bg-red-500/80 flex items-center justify-center text-white/90 transition-all duration-500"
-          style={{ width: `${Math.max(shortPct, 8)}%` }}
+          className="bg-red-500 flex items-center justify-center text-white transition-all duration-500"
+          style={{ width: `${Math.max(shortPct, 12)}%` }}
         >
-          {shortPct.toFixed(0)}%
+          {shortPct.toFixed(0)}% S
         </div>
       </div>
 
