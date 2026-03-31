@@ -75,7 +75,7 @@ export function App() {
         {data && (
           <>
             {/* Row 1: BTC Price hero */}
-            <div className="rounded-xl p-3 backdrop-blur-sm" style={{ background: "var(--bg-card)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--bg-card-border)" }}>
+            <div className="relative rounded-xl p-3 backdrop-blur-sm overflow-visible hover:z-20 focus-within:z-20" style={{ background: "var(--bg-card)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--bg-card-border)" }}>
               <SymbolPriceGrid prices={data.prices} />
             </div>
 

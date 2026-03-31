@@ -1,4 +1,5 @@
 import type { LongShortAggregated, LongShortData } from "../lib/types";
+import { InfoTooltip } from "./info-tooltip";
 
 interface Props {
   longShort: LongShortAggregated;
@@ -88,16 +89,22 @@ export function LiquidationRatioDisplayCard({ longShort, className = "" }: Props
 
   if (!hasData) {
     return (
-      <div className={`rounded-xl p-4 backdrop-blur-sm ${className}`} style={{ background: "var(--bg-card)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--bg-card-border)" }}>
-        <h3 className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Long/Short Ratio</h3>
+      <div className={`relative rounded-xl p-4 backdrop-blur-sm overflow-visible hover:z-20 focus-within:z-20 ${className}`} style={{ background: "var(--bg-card)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--bg-card-border)" }}>
+        <h3 className="text-xs font-semibold uppercase tracking-wider flex items-center gap-1" style={{ color: "var(--text-muted)" }}>
+          Long/Short Ratio
+          <InfoTooltip content="Long vs short positions on Binance Futures. Ratio >1 = more longs (bullish crowd). Shows All Accounts, Top Traders by Account, and Top Traders by Position." />
+        </h3>
         <p className="text-xs mt-2" style={{ color: "var(--text-muted)" }}>No data available</p>
       </div>
     );
   }
 
   return (
-    <div className={`rounded-xl p-4 flex flex-col gap-2 backdrop-blur-sm ${className}`} style={{ background: "var(--bg-card)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--bg-card-border)" }}>
-      <h3 className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Long/Short Ratio</h3>
+    <div className={`relative rounded-xl p-4 flex flex-col gap-2 backdrop-blur-sm overflow-visible hover:z-20 focus-within:z-20 ${className}`} style={{ background: "var(--bg-card)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--bg-card-border)" }}>
+      <h3 className="text-xs font-semibold uppercase tracking-wider flex items-center gap-1" style={{ color: "var(--text-muted)" }}>
+        Long/Short Ratio
+        <InfoTooltip content="Long vs short positions on Binance Futures. Ratio >1 = more longs (bullish crowd). Shows All Accounts, Top Traders by Account, and Top Traders by Position." />
+      </h3>
 
       <div className="flex flex-col gap-1.5">
         {longShort.global.length > 0 && (

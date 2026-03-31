@@ -1,4 +1,5 @@
 import { formatPercent } from "../lib/number-format-utils";
+import { InfoTooltip } from "./info-tooltip";
 
 interface FearGreedDisplayCardProps {
   value: number;
@@ -31,8 +32,11 @@ export function FearGreedDisplayCard({ value, classification, change24h }: FearG
   const isPositiveChange = change24h !== null && change24h >= 0;
 
   return (
-    <div className="rounded-xl p-4 flex flex-col gap-2 backdrop-blur-sm" style={{ background: "var(--bg-card)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--bg-card-border)" }}>
-      <h2 className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Fear & Greed</h2>
+    <div className="relative rounded-xl p-4 flex flex-col gap-2 backdrop-blur-sm overflow-visible hover:z-20 focus-within:z-20" style={{ background: "var(--bg-card)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--bg-card-border)" }}>
+      <h2 className="text-xs font-semibold uppercase tracking-wider flex items-center gap-1" style={{ color: "var(--text-muted)" }}>
+        Fear & Greed
+        <InfoTooltip content="Crypto market sentiment from alternative.me. 0 = Extreme Fear, 100 = Extreme Greed. Updated daily." />
+      </h2>
 
       <div className="flex items-end justify-between">
         <div>

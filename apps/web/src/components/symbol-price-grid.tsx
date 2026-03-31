@@ -1,5 +1,6 @@
 import type { PriceSnapshot } from "../lib/types";
 import { formatPrice, formatPercent } from "../lib/number-format-utils";
+import { InfoTooltip } from "./info-tooltip";
 
 interface SymbolPriceGridProps {
   prices: PriceSnapshot[];
@@ -77,13 +78,19 @@ export function SymbolPriceGrid({ prices }: SymbolPriceGridProps) {
       <div className="flex items-center gap-3 ml-auto flex-wrap">
         {btc.rsi !== null && (
           <div className="flex flex-col items-center">
-            <span className="text-xs uppercase" style={{ color: "var(--text-muted)" }}>RSI</span>
+            <span className="text-xs uppercase flex items-center gap-0.5" style={{ color: "var(--text-muted)" }}>
+              RSI
+              <InfoTooltip placement="bottom" content="Relative Strength Index (14-period Wilder). >70 = overbought, <30 = oversold. From hourly candles." />
+            </span>
             <span className={`text-sm font-semibold ${rsiColor}`} style={rsiColor ? undefined : { color: "var(--text-secondary)" }}>{btc.rsi.toFixed(1)}</span>
           </div>
         )}
         {btc.volume24h > 0 && (
           <div className="flex flex-col items-center">
-            <span className="text-xs uppercase" style={{ color: "var(--text-muted)" }}>Volume</span>
+            <span className="text-xs uppercase flex items-center gap-0.5" style={{ color: "var(--text-muted)" }}>
+              Volume
+              <InfoTooltip placement="bottom" content="BTC/USDT spot trading volume in last 24 hours. Source: Binance." />
+            </span>
             <span className="text-sm font-semibold" style={{ color: "var(--text-secondary)" }}>{formatVolume(btc.volume24h)}</span>
           </div>
         )}

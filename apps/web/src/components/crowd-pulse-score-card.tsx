@@ -1,6 +1,7 @@
 import type { SignalType, CrowdPulseComponents } from "../lib/types";
 import { SvgGaugeChart } from "./svg-gauge-chart";
 import { ScoreComponentBreakdown } from "./score-component-breakdown";
+import { InfoTooltip } from "./info-tooltip";
 
 interface CrowdPulseScoreCardProps {
   score: number | null;
@@ -40,9 +41,12 @@ export function CrowdPulseScoreCard({ score, signal, components, scoreDelta }: C
   const message = CONTRARIAN_MESSAGES[signal];
 
   return (
-    <div className="rounded-xl p-4 flex flex-col items-center gap-2 backdrop-blur-sm" style={{ background: "var(--bg-card)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--bg-card-border)" }}>
+    <div className="relative rounded-xl p-4 flex flex-col items-center gap-2 backdrop-blur-sm overflow-visible hover:z-20 focus-within:z-20" style={{ background: "var(--bg-card)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--bg-card-border)" }}>
       <div className="flex items-center justify-between w-full">
-        <h2 className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Crowd Pulse</h2>
+        <h2 className="text-xs font-semibold uppercase tracking-wider flex items-center gap-1" style={{ color: "var(--text-muted)" }}>
+          Crowd Pulse
+          <InfoTooltip content="Composite sentiment score (0-100). Formula: F&G×35% + RSI×25% + Volume×20% + L/S×20%. Weights auto-redistribute when sources unavailable." />
+        </h2>
         <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${style.badge}`}>
           {style.label}
         </span>
@@ -64,8 +68,9 @@ export function CrowdPulseScoreCard({ score, signal, components, scoreDelta }: C
         </>
       )}
 
-      <div className={`w-full rounded-lg border px-3 py-1.5 text-center ${SIGNAL_BANNER[signal]}`}>
+      <div className={`w-full rounded-lg border px-3 py-1.5 flex items-center justify-center gap-1 ${SIGNAL_BANNER[signal]}`}>
         <p className="text-xs italic" style={{ color: "var(--text-secondary)" }}>{message}</p>
+        <InfoTooltip content="Contrarian signal: when crowd is greedy (80+), consider selling. When fearful (<20), consider buying." />
       </div>
 
       <ScoreComponentBreakdown components={components} />
