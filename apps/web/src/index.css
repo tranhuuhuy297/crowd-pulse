@@ -23,6 +23,7 @@
   --gauge-score-text: #1c1917;
   --gauge-label-text: #78716c;
   --accent: #d97706;
+  --accent-rgb: 217, 119, 6;
 }
 
 /* Dark theme — charcoal, monochrome + amber accent */
@@ -42,6 +43,7 @@
   --gauge-score-text: #e5e5e5;
   --gauge-label-text: #737373;
   --accent: #f59e0b;
+  --accent-rgb: 245, 158, 11;
 }
 
 /* Base styles */
@@ -51,4 +53,25 @@ body {
 
 code, pre, kbd, samp {
   font-family: var(--font-code);
+}
+
+/* Card hover effect — subtle amber border accent */
+.hover-card:hover {
+  border-color: rgba(var(--accent-rgb), 0.3) !important;
+}
+
+/* BUY_NOW pulsing green glow */
+@keyframes pulse-border {
+  0%, 100% { box-shadow: 0 0 20px rgba(34,197,94,0.2), 0 0 40px rgba(34,197,94,0.08); }
+  50% { box-shadow: 0 0 30px rgba(34,197,94,0.35), 0 0 60px rgba(34,197,94,0.15); }
+}
+
+.pulse-buy-now {
+  animation: pulse-border 3s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse-buy-now {
+    animation: none;
+  }
 }

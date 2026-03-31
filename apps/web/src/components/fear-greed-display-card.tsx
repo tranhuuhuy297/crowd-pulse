@@ -1,4 +1,6 @@
 import { formatPercent } from "../lib/number-format-utils";
+import { sentimentTextColor, FEAR_GREED_TIERS } from "../lib/sentiment-color-utils";
+import { DashboardCard } from "./dashboard-card";
 import { InfoTooltip } from "./info-tooltip";
 
 interface FearGreedDisplayCardProps {
@@ -17,23 +19,14 @@ function getBarColor(value: number): string {
   return "bg-red-500";
 }
 
-/** Returns text color — green (fear) to red (greed) */
-function getValueColor(value: number): string {
-  if (value <= 25) return "text-green-500";
-  if (value <= 45) return "text-green-400";
-  if (value <= 55) return "text-neutral-400";
-  if (value <= 75) return "text-red-400";
-  return "text-red-500";
-}
-
 /** Compact Fear & Greed index card */
 export function FearGreedDisplayCard({ value, classification, change24h, className = "" }: FearGreedDisplayCardProps) {
   const barColor = getBarColor(value);
-  const valueColor = getValueColor(value);
+  const valueColor = sentimentTextColor(value, FEAR_GREED_TIERS);
   const isPositiveChange = change24h !== null && change24h >= 0;
 
   return (
-    <div className={`relative rounded-xl p-3 flex flex-col gap-1.5 backdrop-blur-sm overflow-visible hover:z-20 focus-within:z-20 ${className}`} style={{ background: "var(--bg-card)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--bg-card-border)" }}>
+    <DashboardCard className={`flex flex-col gap-1.5 ${className}`}>
       <h2 className="text-xs font-semibold uppercase tracking-wider flex items-center gap-1" style={{ color: "var(--text-muted)" }}>
         Market Sentiment
         <InfoTooltip content="alternative.me Fear & Greed Index. One of 4 inputs to Contrarian Signal." />
@@ -65,6 +58,6 @@ export function FearGreedDisplayCard({ value, classification, change24h, classNa
         <span>Fear</span>
         <span>Greed</span>
       </div>
-    </div>
+    </DashboardCard>
   );
 }

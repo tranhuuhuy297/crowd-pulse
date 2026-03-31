@@ -9,6 +9,8 @@ import { FuturesBasisDisplayCard } from "./components/futures-basis-display-card
 import { TopTraderAndTakerDisplayCard } from "./components/top-trader-and-taker-display-card";
 import { SymbolPriceGrid } from "./components/symbol-price-grid";
 import { BuyConclusionDisplayCard } from "./components/buy-conclusion-display-card";
+import { MarketPulseSummaryBar } from "./components/market-pulse-summary-bar";
+import { DashboardCard } from "./components/dashboard-card";
 import { DashboardLoadingSkeleton } from "./components/dashboard-loading-skeleton";
 import { ThemeToggleButton } from "./components/theme-toggle-button";
 import { formatRelativeTime } from "./lib/number-format-utils";
@@ -39,16 +41,13 @@ export function App() {
 
   return (
     <div className="h-screen flex flex-col overflow-hidden" style={{ background: "var(--bg-primary)", color: "var(--text-primary)" }}>
-      {/* Minimal top bar */}
-      <header className="px-4 py-1.5 flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-bold tracking-tight" style={{ color: "var(--accent)" }}>
-            CrowdPulse
-          </span>
-          <span className="text-xs" style={{ color: "var(--text-faint)" }}>·</span>
-          <span className="text-xs" style={{ color: "var(--text-muted)" }}>Crypto Sentiment</span>
-        </div>
-        <div className="flex items-center gap-2">
+      {/* Top bar: brand + metric chips + controls */}
+      <header className="px-4 py-3 flex items-center gap-3 shrink-0">
+        <span className="text-sm font-bold tracking-tight shrink-0" style={{ color: "var(--accent)" }}>
+          CrowdPulse
+        </span>
+        {data && <MarketPulseSummaryBar data={data} />}
+        <div className="flex items-center gap-2 ml-auto shrink-0">
           {data && (
             <>
               <span
@@ -81,11 +80,11 @@ export function App() {
 
         {data && (
           <>
-            {/* Row 1: BTC Price + Buy Conclusion side by side */}
+            {/* Row 1: BTC/ETH Price + Buy Conclusion side by side */}
             <div className="grid grid-cols-1 gap-2 lg:grid-cols-2 shrink-0">
-              <div className="relative rounded-xl p-2.5 backdrop-blur-sm overflow-visible hover:z-20 focus-within:z-20" style={{ background: "var(--bg-card)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--bg-card-border)" }}>
+              <DashboardCard padding="p-2.5">
                 <SymbolPriceGrid prices={data.prices} />
-              </div>
+              </DashboardCard>
               {data.buyConclusion && (
                 <BuyConclusionDisplayCard conclusion={data.buyConclusion} />
               )}

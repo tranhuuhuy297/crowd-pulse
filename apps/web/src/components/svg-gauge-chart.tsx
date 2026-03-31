@@ -1,3 +1,5 @@
+import { useState, useEffect } from "react";
+
 interface GaugeChartProps {
   score: number;
   size?: number;
@@ -14,7 +16,14 @@ function getArcColor(score: number): string {
 
 /** SVG semicircle gauge showing score 0-100 with colored arc and needle */
 export function SvgGaugeChart({ score, size = 200 }: GaugeChartProps) {
-  const pad = size * 0.12; // horizontal padding for Fear/Greed labels
+  // Animate from 0 to actual score on mount/change
+  const [animatedScore, setAnimatedScore] = useState(0);
+  useEffect(() => {
+    const t = setTimeout(() => setAnimatedScore(score), 50);
+    return () => clearTimeout(t);
+  }, [score]);
+
+  const pad = size * 0.12;
   const cx = size / 2 + pad;
   const cy = size / 2;
   const r = size * 0.38;
@@ -22,26 +31,23 @@ export function SvgGaugeChart({ score, size = 200 }: GaugeChartProps) {
   const viewW = size + pad * 2;
   const viewH = size * 0.85;
 
-  // Arc math: semicircle from left (180°) to right (0°) going over top
-  // We use standard SVG arc going counterclockwise from (cx-r, cy) to (cx+r, cy)
   const trackD = `M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${cx + r} ${cy}`;
 
-  // Score fill: 0 = left, 100 = right. Angle from PI to 0 (left to right over top)
-  const scoreRad = Math.PI * (1 - score / 100);
+  // Use animatedScore for arc + needle position
+  const scoreRad = Math.PI * (1 - animatedScore / 100);
   const fillEndX = cx + r * Math.cos(scoreRad);
   const fillEndY = cy - r * Math.sin(scoreRad);
-  const largeArc = score > 50 ? 1 : 0;
+  const largeArc = animatedScore > 50 ? 1 : 0;
   const fillD =
-    score > 0
+    animatedScore > 0
       ? `M ${cx - r} ${cy} A ${r} ${r} 0 ${largeArc} 1 ${fillEndX} ${fillEndY}`
       : "";
 
-  // Needle points from center toward the score position on arc
   const needleLen = r * 0.78;
   const nx = cx + needleLen * Math.cos(scoreRad);
   const ny = cy - needleLen * Math.sin(scoreRad);
 
-  const color = getArcColor(score);
+  const color = getArcColor(animatedScore);
 
   return (
     <svg
@@ -82,7 +88,7 @@ export function SvgGaugeChart({ score, size = 200 }: GaugeChartProps) {
       />
       {/* Center dot */}
       <circle cx={cx} cy={cy} r={4} fill="var(--gauge-needle)" />
-      {/* Score number below arc */}
+      {/* Score number — show real score, not animated */}
       <text
         x={cx}
         y={cy + 24}

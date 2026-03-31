@@ -1,6 +1,7 @@
 import type { SignalType, CrowdPulseComponents } from "../lib/types";
 import { SvgGaugeChart } from "./svg-gauge-chart";
 import { ScoreComponentBreakdown } from "./score-component-breakdown";
+import { DashboardCard } from "./dashboard-card";
 import { InfoTooltip } from "./info-tooltip";
 
 interface CrowdPulseScoreCardProps {
@@ -41,7 +42,7 @@ export function CrowdPulseScoreCard({ score, signal, components, scoreDelta }: C
   const message = CONTRARIAN_MESSAGES[signal];
 
   return (
-    <div className="relative rounded-xl p-4 flex flex-col items-center gap-2 backdrop-blur-sm overflow-visible hover:z-20 focus-within:z-20" style={{ background: "var(--bg-card)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--bg-card-border)" }}>
+    <DashboardCard className="flex flex-col items-center gap-2" padding="p-4">
       <div className="flex items-center justify-between w-full">
         <h2 className="text-xs font-semibold uppercase tracking-wider flex items-center gap-1" style={{ color: "var(--text-muted)" }}>
           Contrarian Signal
@@ -74,6 +75,6 @@ export function CrowdPulseScoreCard({ score, signal, components, scoreDelta }: C
       </div>
 
       <ScoreComponentBreakdown components={components} />
-    </div>
+    </DashboardCard>
   );
 }

@@ -1,4 +1,5 @@
 import type { BuyConclusionData } from "../lib/types";
+import { DashboardCard } from "./dashboard-card";
 import { InfoTooltip } from "./info-tooltip";
 
 interface BuyConclusionDisplayCardProps {
@@ -7,7 +8,6 @@ interface BuyConclusionDisplayCardProps {
 
 const RECOMMENDATION_CONFIG: Record<BuyConclusionData["recommendation"], {
   label: string;
-  /** dark:text-green-400 light:text-green-700 — both pass 4.5:1 contrast */
   labelColor: string;
   borderColor: string;
   glowShadow: string;
@@ -57,14 +57,13 @@ export function BuyConclusionDisplayCard({ conclusion }: BuyConclusionDisplayCar
   const c = RECOMMENDATION_CONFIG[conclusion.recommendation];
   const keyPrice = conclusion.suggestedEntry ?? conclusion.resistance;
   const keyLabel = conclusion.suggestedEntry !== null ? "Entry" : "Resistance";
+  const pulseClass = conclusion.recommendation === "BUY_NOW" ? "pulse-buy-now" : "";
 
   return (
-    <div
-      className="relative rounded-xl px-4 py-3 backdrop-blur-sm overflow-visible"
+    <DashboardCard
+      className={pulseClass}
+      padding="px-4 py-3"
       style={{
-        background: "var(--bg-card)",
-        borderWidth: 1,
-        borderStyle: "solid",
         borderColor: c.borderColor,
         boxShadow: c.glowShadow,
       }}
@@ -102,7 +101,7 @@ export function BuyConclusionDisplayCard({ conclusion }: BuyConclusionDisplayCar
           <ConfidenceRing value={conclusion.confidence} color={`rgb(${c.accentRgb})`} />
         </div>
       </div>
-    </div>
+    </DashboardCard>
   );
 }
 
