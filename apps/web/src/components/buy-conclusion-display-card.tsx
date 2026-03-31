@@ -62,7 +62,7 @@ export function BuyConclusionDisplayCard({ conclusion }: BuyConclusionDisplayCar
   return (
     <DashboardCard
       className={pulseClass}
-      padding="px-4 py-3"
+      padding="p-4"
       style={{
         borderColor: c.borderColor,
         boxShadow: c.glowShadow,
@@ -71,35 +71,32 @@ export function BuyConclusionDisplayCard({ conclusion }: BuyConclusionDisplayCar
       {/* Background glow */}
       <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: c.bgGradient }} />
 
-      {/* Single-row layout */}
-      <div className="relative flex items-center gap-4 flex-wrap">
-        {/* Left: recommendation label */}
-        <div className="flex flex-col shrink-0">
+      {/* Centered balanced layout */}
+      <div className="relative flex items-center gap-4">
+        {/* Left: confidence ring */}
+        <ConfidenceRing value={conclusion.confidence} color={`rgb(${c.accentRgb})`} />
+
+        {/* Center: recommendation + summary */}
+        <div className="flex-1 flex flex-col items-center text-center min-w-0 gap-0.5">
           <span className="text-xs font-semibold uppercase tracking-wider flex items-center gap-1" style={{ color: "var(--text-muted)" }}>
             Should you buy?
             <InfoTooltip content="Sentiment + support/resistance. NFA." />
           </span>
           <span className={`text-xl font-bold tracking-tight ${c.labelColor}`}>{c.label}</span>
+          <p className="text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
+            {conclusion.summary}
+          </p>
         </div>
 
-        {/* Vertical divider */}
-        <div className="hidden sm:block h-10 w-px shrink-0" style={{ background: `rgba(${c.accentRgb}, 0.2)` }} />
-
-        {/* Center: summary */}
-        <p className="flex-1 text-sm font-medium min-w-0" style={{ color: "var(--text-primary)" }}>
-          {conclusion.summary}
-        </p>
-
-        {/* Right: key price + confidence */}
-        <div className="flex items-center gap-3 shrink-0">
-          {keyPrice !== null && (
-            <div className="text-right">
-              <p className="text-xs" style={{ color: "var(--text-muted)" }}>{keyLabel}</p>
-              <p className="text-base font-bold tabular-nums" style={{ color: "var(--accent)" }}>{fmtPrice(keyPrice)}</p>
-            </div>
-          )}
-          <ConfidenceRing value={conclusion.confidence} color={`rgb(${c.accentRgb})`} />
-        </div>
+        {/* Right: key price */}
+        {keyPrice !== null ? (
+          <div className="text-center shrink-0">
+            <p className="text-xs" style={{ color: "var(--text-muted)" }}>{keyLabel}</p>
+            <p className="text-base font-bold tabular-nums" style={{ color: "var(--accent)" }}>{fmtPrice(keyPrice)}</p>
+          </div>
+        ) : (
+          <div className="w-11 shrink-0" />
+        )}
       </div>
     </DashboardCard>
   );
