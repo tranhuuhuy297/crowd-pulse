@@ -34,7 +34,7 @@ export function OpenInterestDisplayCard({ openInterest, className = "" }: Props)
           Open Interest
           <InfoTooltip content={TOOLTIP} />
         </h3>
-        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${badge.classes}`}>
+        <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${badge.classes}`}>
           {badge.label}
         </span>
       </div>

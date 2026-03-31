@@ -34,7 +34,7 @@ export function FuturesBasisDisplayCard({ futuresBasis, className = "" }: Props)
           Futures Basis
           <InfoTooltip content={TOOLTIP} />
         </h3>
-        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${badge.classes}`}>
+        <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${badge.classes}`}>
           {badge.label}
         </span>
       </div>

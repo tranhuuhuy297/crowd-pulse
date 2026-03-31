@@ -41,7 +41,7 @@ export function TopTraderAndTakerDisplayCard({ topTrader, takerBuySell, classNam
               Top Traders
               <InfoTooltip content={TOP_TOOLTIP} />
             </h3>
-            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${ttBadge.classes}`}>
+            <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${ttBadge.classes}`}>
               {ttBadge.label}
             </span>
           </div>
@@ -67,7 +67,7 @@ export function TopTraderAndTakerDisplayCard({ topTrader, takerBuySell, classNam
               Taker Buy/Sell
               <InfoTooltip content={TAKER_TOOLTIP} />
             </h3>
-            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${tkBadge.classes}`}>
+            <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${tkBadge.classes}`}>
               {tkBadge.label}
             </span>
           </div>

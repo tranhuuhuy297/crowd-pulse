@@ -13,11 +13,11 @@ interface CrowdPulseScoreCardProps {
 }
 
 const SIGNAL_STYLES: Record<SignalType, { badge: string; label: string }> = {
-  STRONG_BUY: { badge: "bg-green-500/20 text-green-400 border-green-500/30",    label: "Strong Buy" },
-  BUY:        { badge: "bg-green-500/15 text-green-400 border-green-500/20",    label: "Buy" },
-  NEUTRAL:    { badge: "bg-neutral-500/20 text-neutral-400 border-neutral-500/30", label: "Neutral" },
-  SELL:       { badge: "bg-red-500/15 text-red-400 border-red-500/20",          label: "Sell" },
-  STRONG_SELL:{ badge: "bg-red-500/20 text-red-400 border-red-500/30",          label: "Strong Sell" },
+  STRONG_BUY: { badge: "bg-green-500/20 text-green-700 dark:text-green-400 border-green-500/30",    label: "Strong Buy" },
+  BUY:        { badge: "bg-green-500/15 text-green-700 dark:text-green-400 border-green-500/20",    label: "Buy" },
+  NEUTRAL:    { badge: "bg-neutral-500/20 text-neutral-700 dark:text-neutral-400 border-neutral-500/30", label: "Neutral" },
+  SELL:       { badge: "bg-red-500/15 text-red-700 dark:text-red-400 border-red-500/20",          label: "Sell" },
+  STRONG_SELL:{ badge: "bg-red-500/20 text-red-700 dark:text-red-400 border-red-500/30",          label: "Strong Sell" },
 };
 
 const CONTRARIAN_MESSAGES: Record<SignalType, string> = {
@@ -48,7 +48,7 @@ export function CrowdPulseScoreCard({ score, signal, components, scoreDelta }: C
           Contrarian Signal
           <InfoTooltip content="Composite score 0-100. Blends Market Sentiment, RSI, Volume & L/S Ratio." />
         </h2>
-        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${style.badge}`}>
+        <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${style.badge}`}>
           {style.label}
         </span>
       </div>

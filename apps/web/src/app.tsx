@@ -82,7 +82,7 @@ export function App() {
           <>
             {/* Row 1: BTC/ETH Price + Buy Conclusion side by side */}
             <div className="grid grid-cols-1 gap-2 lg:grid-cols-2 shrink-0">
-              <DashboardCard padding="p-2.5">
+              <DashboardCard padding="px-4 py-3">
                 <SymbolPriceGrid prices={data.prices} />
               </DashboardCard>
               {data.buyConclusion && (
