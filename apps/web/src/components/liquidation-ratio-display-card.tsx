@@ -54,7 +54,7 @@ export function LiquidationRatioDisplayCard({ longShort, className = "" }: Props
       </div>
 
       {/* Hero ratio number */}
-      <div className="text-2xl font-bold tracking-tight" style={{ color: "var(--text-primary)" }}>
+      <div className="text-2xl font-bold tracking-tight stat-value" style={{ color: "var(--text-primary)" }}>
         {avg.toFixed(2)}
       </div>
 

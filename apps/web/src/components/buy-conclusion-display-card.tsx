@@ -66,7 +66,8 @@ export function BuyConclusionDisplayCard({ conclusion }: BuyConclusionDisplayCar
       style={{
         borderColor: c.borderColor,
         boxShadow: c.glowShadow,
-      }}
+        "--hover-border-color": c.borderColor,
+      } as React.CSSProperties}
     >
       {/* Background glow */}
       <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: c.bgGradient }} />
@@ -82,7 +83,7 @@ export function BuyConclusionDisplayCard({ conclusion }: BuyConclusionDisplayCar
             Should you buy?
             <InfoTooltip content="Sentiment + support/resistance. NFA." />
           </span>
-          <span className={`text-xl font-bold tracking-tight ${c.labelColor}`}>{c.label}</span>
+          <span className={`text-xl font-bold tracking-tight stat-value ${c.labelColor}`}>{c.label}</span>
           <p className="text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
             {conclusion.summary}
           </p>

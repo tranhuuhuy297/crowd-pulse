@@ -39,7 +39,7 @@ export function OpenInterestDisplayCard({ openInterest, className = "" }: Props)
         </span>
       </div>
 
-      <div className={`text-2xl font-bold tracking-tight ${sentimentTextColor(avgChange, OI_CHANGE_TIERS)}`}>
+      <div className={`text-2xl font-bold tracking-tight stat-value ${sentimentTextColor(avgChange, OI_CHANGE_TIERS)}`}>
         {avgChange >= 0 ? "+" : ""}{avgChange.toFixed(1)}%
       </div>
 

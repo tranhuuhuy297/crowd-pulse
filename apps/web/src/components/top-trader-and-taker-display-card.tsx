@@ -45,7 +45,7 @@ export function TopTraderAndTakerDisplayCard({ topTrader, takerBuySell, classNam
               {ttBadge.label}
             </span>
           </div>
-          <div className={`text-2xl font-bold tracking-tight ${sentimentTextColor(tt.ratio, TOP_TRADER_RATIO_TIERS)}`}>
+          <div className={`text-2xl font-bold tracking-tight stat-value ${sentimentTextColor(tt.ratio, TOP_TRADER_RATIO_TIERS)}`}>
             {tt.ratio.toFixed(2)}
           </div>
           <div className="flex h-5 rounded-full overflow-hidden text-xs font-bold">
@@ -76,7 +76,7 @@ export function TopTraderAndTakerDisplayCard({ topTrader, takerBuySell, classNam
               {tkBadge.label}
             </span>
           </div>
-          <div className={`text-lg font-bold tracking-tight ${sentimentTextColor(tk.buySellRatio, TOP_TRADER_RATIO_TIERS)}`}>
+          <div className={`text-lg font-bold tracking-tight stat-value ${sentimentTextColor(tk.buySellRatio, TOP_TRADER_RATIO_TIERS)}`}>
             {tk.buySellRatio.toFixed(3)}
           </div>
           {/* Taker buy/sell volume bar */}

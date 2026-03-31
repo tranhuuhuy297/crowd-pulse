@@ -40,7 +40,7 @@ export function FundingRateDisplayCard({ fundingRates, className = "" }: Props) 
         </span>
       </div>
 
-      <div className={`text-2xl font-bold tracking-tight ${sentimentTextColor(avgRate, FUNDING_RATE_TIERS)}`}>
+      <div className={`text-2xl font-bold tracking-tight stat-value ${sentimentTextColor(avgRate, FUNDING_RATE_TIERS)}`}>
         {avgRate >= 0 ? "+" : ""}{pct}%
       </div>
 

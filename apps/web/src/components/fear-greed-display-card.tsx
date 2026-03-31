@@ -34,7 +34,7 @@ export function FearGreedDisplayCard({ value, classification, change24h, classNa
 
       <div className="flex items-end justify-between">
         <div>
-          <span className={`text-4xl font-bold ${valueColor}`}>{value}</span>
+          <span className={`text-4xl font-bold stat-value ${valueColor}`}>{value}</span>
           <span className="text-xs ml-1" style={{ color: "var(--text-muted)" }}>/ 100</span>
         </div>
         <div className="text-right">

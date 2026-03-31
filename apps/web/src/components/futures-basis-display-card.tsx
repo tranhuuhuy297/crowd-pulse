@@ -40,7 +40,7 @@ export function FuturesBasisDisplayCard({ futuresBasis, className = "" }: Props)
       </div>
 
       {/* Hero: 2 decimal places for readability */}
-      <div className={`text-2xl font-bold tracking-tight ${sentimentTextColor(avg, BASIS_PCT_TIERS)}`}>
+      <div className={`text-2xl font-bold tracking-tight stat-value ${sentimentTextColor(avg, BASIS_PCT_TIERS)}`}>
         {avg >= 0 ? "+" : ""}{avg.toFixed(2)}%
       </div>
 

@@ -65,9 +65,9 @@ code, pre, kbd, samp {
   font-family: var(--font-code);
 }
 
-/* Card hover — border glow pulse + inner radial highlight */
+/* Card hover — lift + border glow + inner radial highlight */
 .hover-card {
-  transition: box-shadow 0.4s ease, border-color 0.3s ease;
+  transition: box-shadow 0.4s ease, border-color 0.3s ease, transform 0.3s ease;
 }
 
 .hover-card::before {
@@ -87,15 +87,29 @@ code, pre, kbd, samp {
 }
 
 .hover-card:hover {
-  border-color: rgba(var(--accent-rgb), 0.4) !important;
+  transform: translateY(-3px);
+  border-color: var(--hover-border-color, rgba(var(--accent-rgb), 0.4));
   box-shadow:
     0 0 0 1px rgba(var(--accent-rgb), 0.1),
     0 0 20px rgba(var(--accent-rgb), 0.1),
+    0 8px 25px rgba(0, 0, 0, 0.1),
     inset 0 1px 0 rgba(var(--accent-rgb), 0.08);
 }
 
 .hover-card:hover::before {
   opacity: 1;
+}
+
+/* Important numbers pop on card hover */
+.stat-value {
+  transition: transform 0.3s ease, filter 0.3s ease;
+  display: inline-block;
+  transform-origin: left bottom;
+}
+
+.hover-card:hover .stat-value {
+  transform: scale(1.06);
+  filter: brightness(1.15);
 }
 
 /* BUY_NOW pulsing green glow */
@@ -118,4 +132,7 @@ code, pre, kbd, samp {
   .pulse-buy-now { animation: none; }
   .hover-card { transition: none; }
   .hover-card::before { display: none; }
+  .stat-value { transition: none; }
+  .hover-card:hover .stat-value { transform: none; filter: none; }
+  .hover-card:hover { transform: none; }
 }
