@@ -2,10 +2,10 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { TRACKED_SYMBOLS, SYMBOL_DISPLAY_NAMES } from "../lib/constants";
 import { fetchFearGreedIndex } from "../lib/api/fear-greed-index-fetcher";
 import { fetchSpotTickers, fetchKlineClosesAndVolumes } from "../lib/api/binance-spot-price-and-klines-fetcher";
-import { fetchAllLongShortRatios } from "../lib/api/binance-futures-long-short-ratio-fetcher";
+import { fetchAllLongShortData } from "../lib/api/binance-futures-long-short-ratio-fetcher";
 import { calculateRSI } from "../lib/rsi-wilder-smoothing-calculator";
 import { calculateCrowdPulseScore, normalizeToHundred } from "../lib/crowd-pulse-score-calculator";
-import type { DashboardData, PriceSnapshot, LongShortData } from "../lib/types";
+import type { DashboardData, PriceSnapshot, LongShortData, LongShortAggregated, DataSourceHealth } from "../lib/types";
 
 /** Compute volume anomaly: latest volume vs average of previous candles */
 function computeVolumeAnomaly(volumes: number[]): number | null {
@@ -30,8 +30,16 @@ async function fetchAllData(): Promise<DashboardData> {
     fetchFearGreedIndex(),
     fetchSpotTickers(TRACKED_SYMBOLS),
     Promise.all(TRACKED_SYMBOLS.map((s) => fetchKlineClosesAndVolumes(s))),
-    fetchAllLongShortRatios(TRACKED_SYMBOLS),
+    fetchAllLongShortData(TRACKED_SYMBOLS),
   ]);
+
+  // Derive data source health from settlement statuses
+  const dataSourceHealth: DataSourceHealth = {
+    fearGreed: fearGreedResult.status === "fulfilled",
+    prices: tickersResult.status === "fulfilled",
+    klines: klinesResult.status === "fulfilled",
+    longShort: longShortResult.status === "fulfilled",
+  };
 
   // Extract results with safe defaults
   const fearGreed = fearGreedResult.status === "fulfilled" ? fearGreedResult.value : null;
@@ -56,15 +64,20 @@ async function fetchAllData(): Promise<DashboardData> {
     return { ...t, rsi };
   });
 
-  // Long/short ratios
-  const longShort: LongShortData[] =
-    longShortResult.status === "fulfilled" ? longShortResult.value : [];
+  // Long/short ratios — 3 types: global, top trader account, top trader position
+  const longShortRaw: LongShortAggregated = longShortResult.status === "fulfilled"
+    ? longShortResult.value
+    : { global: [], topTraderAccount: [], topTraderPosition: [] };
 
-  // Map long/short display names
-  const longShortDisplay = longShort.map((ls) => ({
-    ...ls,
-    symbol: SYMBOL_DISPLAY_NAMES[ls.symbol] ?? ls.symbol,
-  }));
+  // Map display names for all 3 types
+  const mapDisplayNames = (data: LongShortData[]) =>
+    data.map((ls) => ({ ...ls, symbol: SYMBOL_DISPLAY_NAMES[ls.symbol] ?? ls.symbol }));
+
+  const longShortDisplay: LongShortAggregated = {
+    global: mapDisplayNames(longShortRaw.global),
+    topTraderAccount: mapDisplayNames(longShortRaw.topTraderAccount),
+    topTraderPosition: mapDisplayNames(longShortRaw.topTraderPosition),
+  };
 
   // Compute aggregates for score
   const avgRsi = rsiValues.length > 0
@@ -73,7 +86,7 @@ async function fetchAllData(): Promise<DashboardData> {
   const avgVolumeAnomaly = volumeAnomalies.length > 0
     ? volumeAnomalies.reduce((s, v) => s + v, 0) / volumeAnomalies.length
     : null;
-  const normalizedLongShort = normalizeLongShortRatio(longShort);
+  const normalizedLongShort = normalizeLongShortRatio(longShortRaw.global);
 
   // Calculate CrowdPulse score
   const fgValue = fearGreed?.value ?? 50;
@@ -99,6 +112,7 @@ async function fetchAllData(): Promise<DashboardData> {
     fearGreed: fearGreed ?? { value: 0, classification: "Unknown", change24h: null },
     prices,
     longShort: longShortDisplay,
+    dataSourceHealth,
   };
 }
 
@@ -110,13 +124,19 @@ export function useCrowdPulseData(refreshMs = 60_000) {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [scoreDelta, setScoreDelta] = useState<number | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const prevScoreRef = useRef<number | null>(null);
 
   const refresh = useCallback(async () => {
     try {
       const result = await fetchAllData();
       setData(result);
       setError(null);
+      if (result.crowdPulse.score !== null && prevScoreRef.current !== null) {
+        setScoreDelta(result.crowdPulse.score - prevScoreRef.current);
+      }
+      prevScoreRef.current = result.crowdPulse.score;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch data");
     } finally {
@@ -132,5 +152,5 @@ export function useCrowdPulseData(refreshMs = 60_000) {
     };
   }, [refresh, refreshMs]);
 
-  return { data, loading, error };
+  return { data, loading, error, scoreDelta };
 }

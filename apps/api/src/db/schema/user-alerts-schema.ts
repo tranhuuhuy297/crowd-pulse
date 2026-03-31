@@ -18,6 +18,8 @@ export const userAlerts = pgTable("user_alerts", {
   threshold: numeric("threshold", { precision: 10, scale: 4 }).notNull(),
   channel: varchar("channel", { length: 20 }).notNull().default("web"),
   isActive: boolean("is_active").notNull().default(true),
+  telegramChatId: varchar("telegram_chat_id", { length: 50 }),
+  lastFiredAt: timestamp("last_fired_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),

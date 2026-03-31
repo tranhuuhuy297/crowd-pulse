@@ -5,7 +5,10 @@ export { users } from "./user-accounts-schema";
 export { userAlerts } from "./user-alerts-schema";
 export {
   socialPosts,
+  sentimentAggregates,
   googleTrends,
   liquidationData,
   onchainMetrics,
-} from "./social-posts-placeholder-schema";
+} from "./social-sentiment-schema";
+export { contrarianSignals } from "./contrarian-signals-schema";
+export { telegramSubscribers } from "./telegram-subscribers-schema";

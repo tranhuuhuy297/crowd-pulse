@@ -1,1 +1,54 @@
 @import "tailwindcss";
+@import "@fontsource/space-grotesk/400.css";
+@import "@fontsource/space-grotesk/600.css";
+@import "@fontsource/space-grotesk/700.css";
+@import "@fontsource/space-mono/400.css";
+
+/* Light theme — warm paper, monochrome + amber accent */
+:root {
+  --font-body: "Space Grotesk", system-ui, -apple-system, sans-serif;
+  --font-code: "Space Mono", ui-monospace, monospace;
+  --bg-primary: #faf9f6;
+  --bg-card: rgba(255, 252, 247, 0.9);
+  --bg-card-border: rgba(214, 211, 205, 0.5);
+  --bg-track: rgba(214, 211, 205, 0.4);
+  --bg-skeleton: rgba(214, 211, 205, 0.4);
+  --text-primary: #1c1917;
+  --text-secondary: #57534e;
+  --text-muted: #a8a29e;
+  --text-faint: #d6d3cd;
+  --divider: rgba(214, 211, 205, 0.5);
+  --gauge-track: #e7e5e4;
+  --gauge-needle: #292524;
+  --gauge-score-text: #1c1917;
+  --gauge-label-text: #a8a29e;
+  --accent: #d97706;
+}
+
+/* Dark theme — charcoal, monochrome + amber accent */
+.dark {
+  --bg-primary: #121212;
+  --bg-card: rgba(26, 26, 26, 0.9);
+  --bg-card-border: rgba(42, 42, 42, 0.6);
+  --bg-track: rgba(38, 38, 38, 0.6);
+  --bg-skeleton: rgba(38, 38, 38, 0.5);
+  --text-primary: #e5e5e5;
+  --text-secondary: #a3a3a3;
+  --text-muted: #737373;
+  --text-faint: #404040;
+  --divider: rgba(42, 42, 42, 0.5);
+  --gauge-track: #262626;
+  --gauge-needle: #e5e5e5;
+  --gauge-score-text: #e5e5e5;
+  --gauge-label-text: #737373;
+  --accent: #f59e0b;
+}
+
+/* Base styles */
+body {
+  font-family: var(--font-body);
+}
+
+code, pre, kbd, samp {
+  font-family: var(--font-code);
+}

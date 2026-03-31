@@ -1,4 +1,4 @@
-.PHONY: install dev dev-api dev-web up down kill db-push db-studio db-generate logs logs-api check build clean reset-db psql redis-cli health dashboard
+.PHONY: install dev dev-api dev-web up down kill db-push db-studio db-generate logs logs-api check build clean reset-db psql redis-cli health dashboard docker-build docker-run docker-stop docker-push
 
 # ─── Setup ───────────────────────────────────────────────────────────
 install: ## Install all dependencies
@@ -62,6 +62,20 @@ logs: ## Tail Docker container logs
 
 redis-cli: ## Open Redis CLI
 	docker-compose exec redis redis-cli
+
+# ─── Docker (Production) ─────────────────────────────────────────────────────
+docker-build: ## Build production Docker image
+	docker build -t crowdpulse .
+
+docker-run: ## Run full production stack locally (app + postgres + redis)
+	docker compose -f docker-compose.prod.yml up --build
+
+docker-stop: ## Stop production Docker stack
+	docker compose -f docker-compose.prod.yml down
+
+docker-push: ## Push image to GCP Artifact Registry (requires GCP_PROJECT_ID and REGION env vars)
+	docker tag crowdpulse $(REGION)-docker.pkg.dev/$(GCP_PROJECT_ID)/crowdpulse/crowdpulse:latest
+	docker push $(REGION)-docker.pkg.dev/$(GCP_PROJECT_ID)/crowdpulse/crowdpulse:latest
 
 # ─── Cleanup ─────────────────────────────────────────────────────────
 clean: ## Remove build artifacts and node_modules

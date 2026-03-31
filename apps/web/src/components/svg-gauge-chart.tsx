@@ -3,21 +3,23 @@ interface GaugeChartProps {
   size?: number;
 }
 
-/** Returns arc color based on score bucket */
+/** Returns arc color based on score bucket — green (fear/buy) to red (greed/sell) */
 function getArcColor(score: number): string {
-  if (score <= 20) return "#10b981"; // green — extreme fear
-  if (score <= 40) return "#84cc16"; // lime — fear
-  if (score <= 60) return "#eab308"; // yellow — neutral
-  if (score <= 80) return "#f97316"; // orange — greed
-  return "#ef4444"; // red — extreme greed
+  if (score <= 20) return "#22c55e"; // green-500 — extreme fear
+  if (score <= 40) return "#4ade80"; // green-400 — fear
+  if (score <= 60) return "#a3a3a3"; // neutral-400 — neutral
+  if (score <= 80) return "#f87171"; // red-400 — greed
+  return "#ef4444"; // red-500 — extreme greed
 }
 
 /** SVG semicircle gauge showing score 0-100 with colored arc and needle */
 export function SvgGaugeChart({ score, size = 200 }: GaugeChartProps) {
-  const cx = size / 2;
+  const pad = size * 0.12; // horizontal padding for Fear/Greed labels
+  const cx = size / 2 + pad;
   const cy = size / 2;
   const r = size * 0.38;
   const strokeW = size * 0.07;
+  const viewW = size + pad * 2;
   const viewH = size * 0.75;
 
   // Arc math: semicircle from left (180°) to right (0°) going over top
@@ -43,16 +45,16 @@ export function SvgGaugeChart({ score, size = 200 }: GaugeChartProps) {
 
   return (
     <svg
-      width={size}
+      width={viewW}
       height={viewH}
-      viewBox={`0 0 ${size} ${viewH}`}
+      viewBox={`0 0 ${viewW} ${viewH}`}
       aria-label={`Score: ${Math.round(score)}`}
     >
       {/* Background track */}
       <path
         d={trackD}
         fill="none"
-        stroke="#1f2937"
+        stroke="var(--gauge-track)"
         strokeWidth={strokeW}
         strokeLinecap="round"
       />
@@ -73,24 +75,31 @@ export function SvgGaugeChart({ score, size = 200 }: GaugeChartProps) {
         y1={cy}
         x2={nx}
         y2={ny}
-        stroke="#e5e7eb"
+        stroke="var(--gauge-needle)"
         strokeWidth={2.5}
         strokeLinecap="round"
         style={{ transition: "x2 0.6s ease, y2 0.6s ease" }}
       />
       {/* Center dot */}
-      <circle cx={cx} cy={cy} r={4} fill="#e5e7eb" />
+      <circle cx={cx} cy={cy} r={4} fill="var(--gauge-needle)" />
       {/* Score number below arc */}
       <text
         x={cx}
         y={cy + 24}
         textAnchor="middle"
-        fill="#f3f4f6"
+        fill="var(--gauge-score-text)"
         fontSize={size * 0.13}
         fontWeight="bold"
-        fontFamily="system-ui, sans-serif"
+        fontFamily="var(--font-body)"
       >
         {Math.round(score)}
+      </text>
+      {/* Fear/Greed labels at arc endpoints */}
+      <text x={cx - r - 2} y={cy + 12} textAnchor="end" fill="var(--gauge-label-text)" fontSize={size * 0.06} fontFamily="var(--font-body)">
+        Fear
+      </text>
+      <text x={cx + r + 2} y={cy + 12} textAnchor="start" fill="var(--gauge-label-text)" fontSize={size * 0.06} fontFamily="var(--font-body)">
+        Greed
       </text>
     </svg>
   );

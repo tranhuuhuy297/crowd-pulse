@@ -20,6 +20,16 @@ export interface LongShortData {
   ratio: number;
 }
 
+/** Aggregated long/short ratios: global accounts + top trader accounts + top trader positions */
+export interface LongShortAggregated {
+  /** Global accounts long/short ratio per symbol */
+  global: LongShortData[];
+  /** Top traders account ratio per symbol */
+  topTraderAccount: LongShortData[];
+  /** Top traders position ratio per symbol */
+  topTraderPosition: LongShortData[];
+}
+
 export interface CrowdPulseComponents {
   fearGreed: number;
   avgRsi: number | null;
@@ -34,9 +44,17 @@ export interface CrowdPulseData {
   components: CrowdPulseComponents;
 }
 
+export interface DataSourceHealth {
+  fearGreed: boolean;
+  prices: boolean;
+  klines: boolean;
+  longShort: boolean;
+}
+
 export interface DashboardData {
   crowdPulse: CrowdPulseData;
   fearGreed: FearGreedData;
   prices: PriceSnapshot[];
-  longShort: LongShortData[];
+  longShort: LongShortAggregated;
+  dataSourceHealth: DataSourceHealth;
 }

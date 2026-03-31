@@ -39,4 +39,17 @@ export const dashboardResponseSchema = z.object({
       rsi: z.number().nullable(),
     })
   ),
+  signals: z.array(
+    z.object({
+      id: z.number(),
+      signal: z.string(),
+      confidence: z.string(),
+      score: z.number(),
+      priceAtSignal: z.number(),
+      accurate24h: z.boolean().nullable(),
+      accurate72h: z.boolean().nullable(),
+      accurate7d: z.boolean().nullable(),
+      createdAt: z.string(),
+    })
+  ).default([]),
 });

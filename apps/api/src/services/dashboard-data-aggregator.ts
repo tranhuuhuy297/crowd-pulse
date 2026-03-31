@@ -4,11 +4,19 @@ import { priceCandles } from "../db/schema/market-price-candles-schema";
 import { fearGreedIndex } from "../db/schema/sentiment-fear-greed-schema";
 import { crowdPulse } from "../db/schema/sentiment-crowd-pulse-schema";
 import { calculateCrowdPulse } from "./crowd-pulse-score-calculator";
+import { getLatestSentimentAggregate } from "./reddit-sentiment-score-aggregator";
+import { getLatestTrendsScore, getLatestLiquidationScore, getLatestOnchainScore } from "./phase3-crowd-data-providers";
+import { getLatestTrends } from "./google-trends-db-service";
+import { getLatestLiquidationEntry } from "./liquidation-data-db-service";
 import { logger } from "../lib/logger-instance";
+import { eventBus } from "../lib/event-bus-instance";
 import { TRACKED_SYMBOLS, SYMBOL_DISPLAY_NAMES } from "@crowdpulse/shared";
+import { evaluateSignal } from "./contrarian-signal-evaluator";
+import { getRecentSignals } from "./contrarian-signals-db-service";
 import type {
   DashboardResponse,
   PriceSnapshot,
+  SignalEvent,
 } from "@crowdpulse/shared";
 
 const CANDLE_INTERVAL = "1m";
@@ -89,9 +97,15 @@ function buildPricesMap(
 export async function getDashboardData(): Promise<DashboardResponse> {
   logger.info("Fetching dashboard data");
 
-  const [latestFng, candleMap] = await Promise.all([
+  const [latestFng, candleMap, latestSentiment, trendsScore, liquidationScore, onchainScore, trendsEntries, liquidationEntry] = await Promise.all([
     fetchLatestFearGreed(),
     fetchLatestCandles(),
+    getLatestSentimentAggregate("reddit"),
+    getLatestTrendsScore(),
+    getLatestLiquidationScore(),
+    getLatestOnchainScore(),
+    getLatestTrends(),
+    getLatestLiquidationEntry(),
   ]);
 
   // Build RSI and volume maps from candles
@@ -116,6 +130,19 @@ export async function getDashboardData(): Promise<DashboardResponse> {
       : null,
     rsiValues,
     volumeChanges,
+    sentimentScore: latestSentiment?.avgScore !== undefined && latestSentiment.avgScore !== null
+      ? Number(latestSentiment.avgScore)
+      : null,
+    sentimentPostCount: latestSentiment?.postCount ?? 0,
+    trendsScore,
+    trendsKeywords: Object.fromEntries(
+      (trendsEntries ?? []).map((e) => [e.keyword, e.interestValue])
+    ),
+    liquidationScore,
+    liquidationRatio: liquidationEntry?.longShortRatio !== undefined && liquidationEntry?.longShortRatio !== null
+      ? Number(liquidationEntry.longShortRatio)
+      : null,
+    onchainScore,
   });
 
   // Persist snapshot if score is available (non-blocking)
@@ -125,12 +152,45 @@ export async function getDashboardData(): Promise<DashboardResponse> {
 
   const prices = buildPricesMap(candleMap);
 
+  // Evaluate contrarian signal (non-blocking — runs after snapshot save)
+  const btcCandle = candleMap["BTCUSDT"] ?? null;
+  const btcPrice = btcCandle ? Number(btcCandle.close) : null;
+
+  if (result.score !== null && btcPrice !== null) {
+    evaluateSignal(result.score, btcPrice, result.components)
+      .then((signal) => {
+        if (signal) eventBus.emitNewSignal(signal);
+      })
+      .catch((err) =>
+        logger.warn({ err }, "Signal evaluation failed — non-critical")
+      );
+  }
+
+  // Fetch recent signals for dashboard (last 5)
+  let recentSignals: SignalEvent[] = [];
+  try {
+    const rows = await getRecentSignals(5);
+    recentSignals = rows.map((r) => ({
+      id: r.id,
+      signal: r.signal,
+      confidence: r.confidence,
+      score: Number(r.score),
+      priceAtSignal: Number(r.priceAtSignal),
+      accurate24h: r.accurate24h ?? null,
+      accurate72h: r.accurate72h ?? null,
+      accurate7d: r.accurate7d ?? null,
+      createdAt: r.createdAt.toISOString(),
+    }));
+  } catch (err) {
+    logger.warn({ err }, "Failed to fetch recent signals — non-critical");
+  }
+
   logger.info(
     { score: result.score, signal: result.signal },
     "Dashboard data assembled"
   );
 
-  return {
+  const dashboardResponse: DashboardResponse = {
     crowdPulse: {
       score: result.score,
       signal: result.signal,
@@ -138,5 +198,11 @@ export async function getDashboardData(): Promise<DashboardResponse> {
     },
     components: result.components,
     prices,
+    signals: recentSignals,
   };
+
+  // Emit to SSE clients and alert evaluator (non-blocking)
+  eventBus.emitDashboardUpdate(dashboardResponse);
+
+  return dashboardResponse;
 }

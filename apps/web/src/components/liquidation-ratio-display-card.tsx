@@ -1,54 +1,118 @@
-import type { LongShortData } from "../lib/types";
+import type { LongShortAggregated, LongShortData } from "../lib/types";
 
 interface Props {
-  longShort: LongShortData[];
+  longShort: LongShortAggregated;
+  className?: string;
 }
 
-/** Classify long/short ratio bias */
-function classifyRatio(ratio: number): { label: string; color: string } {
-  if (ratio >= 1.5) return { label: "Heavy Longs", color: "text-red-400" };
-  if (ratio >= 1.1) return { label: "Long Bias", color: "text-orange-400" };
-  if (ratio >= 0.9) return { label: "Balanced", color: "text-gray-400" };
-  if (ratio >= 0.7) return { label: "Short Bias", color: "text-green-400" };
-  return { label: "Heavy Shorts", color: "text-emerald-400" };
+/** Convert ratio to long/short percentages */
+function ratioToPercentages(ratio: number): { longPct: number; shortPct: number } {
+  const longPct = (ratio / (1 + ratio)) * 100;
+  return { longPct, shortPct: 100 - longPct };
 }
 
-export function LiquidationRatioDisplayCard({ longShort }: Props) {
-  if (longShort.length === 0) {
+/** Compute average ratio from array, or null if empty */
+function avgRatio(data: LongShortData[]): number | null {
+  if (data.length === 0) return null;
+  return data.reduce((s, d) => s + d.ratio, 0) / data.length;
+}
+
+/** Classify bias label from ratio */
+function biasLabel(ratio: number): string {
+  if (ratio >= 1.5) return "Heavy Long";
+  if (ratio >= 1.1) return "Long Bias";
+  if (ratio >= 0.9) return "Balanced";
+  if (ratio >= 0.7) return "Short Bias";
+  return "Heavy Short";
+}
+
+/** Bias badge color — heavy long is red (greedy/sell), heavy short is green (fearful/buy) */
+function biasStyle(ratio: number): string {
+  if (ratio >= 1.5) return "bg-red-500/20 text-red-400 border-red-500/30";
+  if (ratio >= 1.1) return "bg-red-500/15 text-red-400 border-red-500/20";
+  if (ratio >= 0.9) return "bg-neutral-500/20 text-neutral-400 border-neutral-500/30";
+  if (ratio >= 0.7) return "bg-green-500/15 text-green-400 border-green-500/20";
+  return "bg-green-500/20 text-green-400 border-green-500/30";
+}
+
+/** Single ratio row with stacked long/short bar + per-symbol detail */
+function RatioRow({ label, data }: { label: string; data: LongShortData[] }) {
+  const avg = avgRatio(data);
+  if (avg === null) return null;
+
+  const { longPct, shortPct } = ratioToPercentages(avg);
+  const bias = biasLabel(avg);
+
+  return (
+    <div className="flex flex-col gap-1">
+      <div className="flex items-center justify-between">
+        <span className="text-xs" style={{ color: "var(--text-muted)" }}>{label}</span>
+        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${biasStyle(avg)}`}>
+          {bias}
+        </span>
+      </div>
+
+      {/* Stacked long/short bar */}
+      <div className="flex h-4 rounded-full overflow-hidden text-xs font-semibold">
+        <div
+          className="bg-green-500/80 flex items-center justify-center text-white/90 transition-all duration-500"
+          style={{ width: `${Math.max(longPct, 8)}%` }}
+        >
+          {longPct.toFixed(0)}%
+        </div>
+        <div
+          className="bg-red-500/80 flex items-center justify-center text-white/90 transition-all duration-500"
+          style={{ width: `${Math.max(shortPct, 8)}%` }}
+        >
+          {shortPct.toFixed(0)}%
+        </div>
+      </div>
+
+      {/* Per-symbol detail */}
+      <div className="flex gap-3">
+        {data.map((d) => (
+          <span key={d.symbol} className="text-xs" style={{ color: "var(--text-muted)" }}>
+            {d.symbol}: {d.ratio.toFixed(2)}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** Compact card showing 3 long/short ratio types: global, top trader account, top trader position */
+export function LiquidationRatioDisplayCard({ longShort, className = "" }: Props) {
+  const hasData = longShort.global.length > 0
+    || longShort.topTraderAccount.length > 0
+    || longShort.topTraderPosition.length > 0;
+
+  if (!hasData) {
     return (
-      <div className="bg-gray-900 border border-gray-800 rounded-xl p-5">
-        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">Long/Short Ratio</h3>
-        <p className="text-gray-600 text-sm mt-3">No data available</p>
+      <div className={`rounded-xl p-4 backdrop-blur-sm ${className}`} style={{ background: "var(--bg-card)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--bg-card-border)" }}>
+        <h3 className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Long/Short Ratio</h3>
+        <p className="text-xs mt-2" style={{ color: "var(--text-muted)" }}>No data available</p>
       </div>
     );
   }
 
-  const avgRatio = longShort.reduce((s, r) => s + r.ratio, 0) / longShort.length;
-  const classification = classifyRatio(avgRatio);
-
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-xl p-5 flex flex-col gap-3">
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">Long/Short Ratio</h3>
-        <span className={`text-xs font-medium ${classification.color}`}>{classification.label}</span>
+    <div className={`rounded-xl p-4 flex flex-col gap-2 backdrop-blur-sm ${className}`} style={{ background: "var(--bg-card)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--bg-card-border)" }}>
+      <h3 className="text-xs font-semibold uppercase tracking-wider" style={{ color: "var(--text-muted)" }}>Long/Short Ratio</h3>
+
+      <div className="flex flex-col gap-1.5">
+        {longShort.global.length > 0 && (
+          <RatioRow label="All Accounts" data={longShort.global} />
+        )}
+        {longShort.topTraderAccount.length > 0 && (
+          <RatioRow label="Top Traders (Acct)" data={longShort.topTraderAccount} />
+        )}
+        {longShort.topTraderPosition.length > 0 && (
+          <RatioRow label="Top Traders (Pos)" data={longShort.topTraderPosition} />
+        )}
       </div>
 
-      <p className="text-3xl font-bold">{avgRatio.toFixed(2)}</p>
-
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        {longShort.map((ls) => {
-          const cls = classifyRatio(ls.ratio);
-          return (
-            <div key={ls.symbol} className="bg-gray-800 rounded-lg px-3 py-2">
-              <span className="text-xs text-gray-400">{ls.symbol}</span>
-              <p className={`text-sm font-semibold ${cls.color}`}>{ls.ratio.toFixed(2)}</p>
-            </div>
-          );
-        })}
-      </div>
-
-      <p className="text-xs text-gray-500">
-        {avgRatio > 1 ? "More longs than shorts" : "More shorts than longs"} (Binance Futures)
+      <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+        Long % = ratio/(1+ratio) · Binance Futures
       </p>
     </div>
   );

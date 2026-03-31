@@ -23,3 +23,21 @@ export const fearGreedQueue = new Queue("fear-greed-crawler", {
     removeOnFail: 50,
   },
 });
+
+/** Queue for Reddit sentiment crawling jobs */
+export const redditSentimentQueue = new Queue("reddit-sentiment", {
+  connection: redisConnection,
+  defaultJobOptions: {
+    removeOnComplete: 100,
+    removeOnFail: 50,
+  },
+});
+
+/** Queue for delayed signal accuracy check jobs (24h / 72h / 7d after signal fires) */
+export const signalAccuracyQueue = new Queue("signal-accuracy", {
+  connection: redisConnection,
+  defaultJobOptions: {
+    removeOnComplete: 50,
+    removeOnFail: 20,
+  },
+});

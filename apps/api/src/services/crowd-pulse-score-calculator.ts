@@ -1,4 +1,7 @@
-import type { SignalType, FearGreedComponent, RSIComponent, VolumeComponent } from "@crowdpulse/shared";
+import type {
+  SignalType, FearGreedComponent, RSIComponent, VolumeComponent,
+  SentimentComponent, TrendsComponent, LiquidationComponent, OnchainComponent,
+} from "@crowdpulse/shared";
 
 export interface CrowdPulseInput {
   fearGreedValue: number | null;
@@ -6,6 +9,13 @@ export interface CrowdPulseInput {
   fearGreedChange24h: number | null;
   rsiValues: Record<string, number | null>;
   volumeChanges: Record<string, number | null>;
+  sentimentScore: number | null;
+  sentimentPostCount: number;
+  trendsScore: number | null;
+  trendsKeywords: Record<string, number>;
+  liquidationScore: number | null;
+  liquidationRatio: number | null;
+  onchainScore: number | null;
 }
 
 export interface CrowdPulseResult {
@@ -15,6 +25,10 @@ export interface CrowdPulseResult {
     fearGreed: FearGreedComponent;
     rsi: RSIComponent;
     volume: VolumeComponent;
+    sentiment: SentimentComponent;
+    trends: TrendsComponent;
+    liquidation: LiquidationComponent;
+    onchain: OnchainComponent;
   };
 }
 
@@ -47,23 +61,33 @@ function avgNonNull(values: Record<string, number | null>): number | null {
 /**
  * Calculate CrowdPulse score from sentiment inputs.
  * Redistributes weights when components are missing.
+ * Active weights: fearGreed 0.30, rsi 0.25, volume 0.25, sentiment 0.20
  */
 export function calculateCrowdPulse(input: CrowdPulseInput): CrowdPulseResult {
-  const BASE_WEIGHTS = { fearGreed: 0.4, rsi: 0.3, volume: 0.3 };
+  const BASE_WEIGHTS = {
+    fearGreed: 0.25, rsi: 0.15, volume: 0.15,
+    sentiment: 0.20, trends: 0.10, liquidation: 0.10, onchain: 0.05,
+  };
 
   const hasFearGreed = input.fearGreedValue !== null;
   const avgRsi = avgNonNull(input.rsiValues);
   const hasRsi = avgRsi !== null;
   const avgVolChange = avgNonNull(input.volumeChanges);
   const hasVolume = avgVolChange !== null;
+  const hasSentiment = input.sentimentScore !== null;
+  const hasTrends = input.trendsScore !== null;
+  const hasLiquidation = input.liquidationScore !== null;
+  const hasOnchain = input.onchainScore !== null;
 
   // Redistribute weights among available components
-  const available = [
-    hasFearGreed ? BASE_WEIGHTS.fearGreed : 0,
-    hasRsi ? BASE_WEIGHTS.rsi : 0,
-    hasVolume ? BASE_WEIGHTS.volume : 0,
-  ];
-  const totalAvailable = available.reduce((s, w) => s + w, 0);
+  const totalAvailable =
+    (hasFearGreed ? BASE_WEIGHTS.fearGreed : 0) +
+    (hasRsi ? BASE_WEIGHTS.rsi : 0) +
+    (hasVolume ? BASE_WEIGHTS.volume : 0) +
+    (hasSentiment ? BASE_WEIGHTS.sentiment : 0) +
+    (hasTrends ? BASE_WEIGHTS.trends : 0) +
+    (hasLiquidation ? BASE_WEIGHTS.liquidation : 0) +
+    (hasOnchain ? BASE_WEIGHTS.onchain : 0);
 
   let score: number | null = null;
 
@@ -71,16 +95,16 @@ export function calculateCrowdPulse(input: CrowdPulseInput): CrowdPulseResult {
     const scale = 1 / totalAvailable;
     let weighted = 0;
 
-    if (hasFearGreed) {
-      weighted += input.fearGreedValue! * (BASE_WEIGHTS.fearGreed * scale);
-    }
-    if (hasRsi) {
-      weighted += avgRsi! * (BASE_WEIGHTS.rsi * scale);
-    }
+    if (hasFearGreed) weighted += input.fearGreedValue! * (BASE_WEIGHTS.fearGreed * scale);
+    if (hasRsi) weighted += avgRsi! * (BASE_WEIGHTS.rsi * scale);
     if (hasVolume) {
       const normalizedVol = normalizeToHundred(avgVolChange!, -50, 50);
       weighted += normalizedVol * (BASE_WEIGHTS.volume * scale);
     }
+    if (hasSentiment) weighted += input.sentimentScore! * (BASE_WEIGHTS.sentiment * scale);
+    if (hasTrends) weighted += input.trendsScore! * (BASE_WEIGHTS.trends * scale);
+    if (hasLiquidation) weighted += input.liquidationScore! * (BASE_WEIGHTS.liquidation * scale);
+    if (hasOnchain) weighted += input.onchainScore! * (BASE_WEIGHTS.onchain * scale);
 
     score = Math.round(weighted * 100) / 100;
   }
@@ -114,6 +138,28 @@ export function calculateCrowdPulse(input: CrowdPulseInput): CrowdPulseResult {
       normalized: normalizedVol,
       weight: hasVolume ? BASE_WEIGHTS.volume : 0,
     } satisfies VolumeComponent,
+    sentiment: {
+      score: input.sentimentScore,
+      postCount: input.sentimentPostCount,
+      source: "reddit",
+      weight: hasSentiment ? BASE_WEIGHTS.sentiment : 0,
+    } satisfies SentimentComponent,
+    trends: {
+      avgInterest: input.trendsScore,
+      keywords: input.trendsKeywords,
+      weight: hasTrends ? BASE_WEIGHTS.trends : 0,
+    } satisfies TrendsComponent,
+    liquidation: {
+      longShortRatio: input.liquidationRatio,
+      normalized: input.liquidationScore,
+      weight: hasLiquidation ? BASE_WEIGHTS.liquidation : 0,
+    } satisfies LiquidationComponent,
+    onchain: {
+      hashRate: null,
+      txCount: null,
+      normalized: input.onchainScore,
+      weight: hasOnchain ? BASE_WEIGHTS.onchain : 0,
+    } satisfies OnchainComponent,
   };
 
   return {
