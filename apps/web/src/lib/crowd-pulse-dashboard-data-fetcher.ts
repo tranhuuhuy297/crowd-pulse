@@ -13,7 +13,7 @@ import type { DashboardData, PriceSnapshot, LongShortData, FundingRateData, Open
 function normalizeLongShortRatio(ratios: LongShortData[]): number | null {
   if (ratios.length === 0) return null;
   const avg = ratios.reduce((s, r) => s + r.ratio, 0) / ratios.length;
-  return normalizeToHundred(avg, 0.5, 2.0);
+  return normalizeToHundred(avg, 0.7, 1.5);
 }
 
 /** Fetch all dashboard data sources in parallel, compute score and buy conclusion */
@@ -74,11 +74,11 @@ export async function fetchAllDashboardData(): Promise<DashboardData> {
 
   const avgFundingRate = fundingRatesRaw.length > 0
     ? fundingRatesRaw.reduce((s, fr) => s + fr.rate, 0) / fundingRatesRaw.length : null;
-  const normalizedFundingRate = avgFundingRate !== null ? normalizeToHundred(avgFundingRate, -0.0005, 0.001) : null;
+  const normalizedFundingRate = avgFundingRate !== null ? normalizeToHundred(avgFundingRate, -0.0003, 0.0005) : null;
 
   const avgOIChange = openInterestRaw.length > 0
     ? openInterestRaw.reduce((s, oi) => s + oi.changePercent, 0) / openInterestRaw.length : null;
-  const normalizedOI = avgOIChange !== null ? normalizeToHundred(avgOIChange, -30, 30) : null;
+  const normalizedOI = avgOIChange !== null ? normalizeToHundred(avgOIChange, -20, 20) : null;
 
   // Lookup BTC by symbol — not by index — to avoid wrong-coin bugs if TRACKED_SYMBOLS reorders
   const btcIndex = TRACKED_SYMBOLS.indexOf("BTCUSDT");
