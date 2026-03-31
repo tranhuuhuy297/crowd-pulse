@@ -21,6 +21,7 @@ COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
 COPY --from=deps /app/packages/shared/node_modules ./packages/shared/node_modules
 
 # Copy source files needed for build
+COPY tsconfig.base.json ./
 COPY packages/shared/ ./packages/shared/
 COPY apps/web/ ./apps/web/
 COPY apps/api/package.json ./apps/api/

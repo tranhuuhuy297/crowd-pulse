@@ -3,7 +3,6 @@ name: CD — Deploy to GCP Cloud Run
 on:
   workflow_dispatch:
   push:
-    branches: [main]
     tags: ['v*']
 
 env:
