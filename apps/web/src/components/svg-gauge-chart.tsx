@@ -20,7 +20,7 @@ export function SvgGaugeChart({ score, size = 200 }: GaugeChartProps) {
   const r = size * 0.38;
   const strokeW = size * 0.07;
   const viewW = size + pad * 2;
-  const viewH = size * 0.75;
+  const viewH = size * 0.85;
 
   // Arc math: semicircle from left (180°) to right (0°) going over top
   // We use standard SVG arc going counterclockwise from (cx-r, cy) to (cx+r, cy)
@@ -95,10 +95,10 @@ export function SvgGaugeChart({ score, size = 200 }: GaugeChartProps) {
         {Math.round(score)}
       </text>
       {/* Fear/Greed labels at arc endpoints */}
-      <text x={cx - r - 2} y={cy + 12} textAnchor="end" fill="var(--gauge-label-text)" fontSize={size * 0.06} fontFamily="var(--font-body)">
+      <text x={cx - r} y={cy + strokeW + 14} textAnchor="middle" fill="var(--gauge-label-text)" fontSize={size * 0.06} fontFamily="var(--font-body)">
         Fear
       </text>
-      <text x={cx + r + 2} y={cy + 12} textAnchor="start" fill="var(--gauge-label-text)" fontSize={size * 0.06} fontFamily="var(--font-body)">
+      <text x={cx + r} y={cy + strokeW + 14} textAnchor="middle" fill="var(--gauge-label-text)" fontSize={size * 0.06} fontFamily="var(--font-body)">
         Greed
       </text>
     </svg>

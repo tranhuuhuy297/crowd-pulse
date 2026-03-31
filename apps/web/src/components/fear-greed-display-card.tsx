@@ -41,11 +41,11 @@ export function FearGreedDisplayCard({ value, classification, change24h, classNa
 
       <div className="flex items-end justify-between">
         <div>
-          <span className={`text-2xl font-bold ${valueColor}`}>{value}</span>
+          <span className={`text-4xl font-bold ${valueColor}`}>{value}</span>
           <span className="text-xs ml-1" style={{ color: "var(--text-muted)" }}>/ 100</span>
         </div>
         <div className="text-right">
-          <p className={`text-base font-semibold ${valueColor}`}>{classification}</p>
+          <p className={`text-lg font-semibold ${valueColor}`}>{classification}</p>
           {change24h !== null && (
             <p className={`text-xs ${isPositiveChange ? "text-green-500" : "text-red-500"}`}>
               {isPositiveChange ? "▲" : "▼"} {formatPercent(Math.abs(change24h))} 24h
@@ -54,9 +54,9 @@ export function FearGreedDisplayCard({ value, classification, change24h, classNa
         </div>
       </div>
 
-      <div className="w-full rounded-full h-2 overflow-hidden" style={{ background: "var(--bg-track)" }}>
+      <div className="w-full rounded-full h-3 overflow-hidden" style={{ background: "var(--bg-track)" }}>
         <div
-          className={`h-2 rounded-full transition-all duration-700 ${barColor}`}
+          className={`h-3 rounded-full transition-all duration-700 ${barColor}`}
           style={{ width: `${value}%` }}
         />
       </div>
