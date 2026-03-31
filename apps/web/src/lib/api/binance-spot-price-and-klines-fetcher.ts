@@ -35,15 +35,22 @@ export async function fetchSpotTickers(symbols: readonly string[]): Promise<Pric
 /** Kline data: [openTime, open, high, low, close, volume, ...] */
 type BinanceKline = [number, string, string, string, string, string, ...unknown[]];
 
+export interface KlineData {
+  closes: number[];
+  volumes: number[];
+  highs: number[];
+  lows: number[];
+}
+
 /**
- * Fetch kline (candlestick) close prices + volumes for a single symbol.
- * Used for RSI calculation and volume anomaly detection.
+ * Fetch kline (candlestick) data for a single symbol.
+ * Returns closes, volumes, highs, lows for RSI, volume anomaly, and support/resistance.
  */
 export async function fetchKlineClosesAndVolumes(
   symbol: string,
-  interval = "1h",
-  limit = 50,
-): Promise<{ closes: number[]; volumes: number[] } | null> {
+  interval = "4h",
+  limit = 100,
+): Promise<KlineData | null> {
   try {
     const res = await fetch(
       `${BINANCE_BASE_URL}/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=${limit}`,
@@ -55,6 +62,8 @@ export async function fetchKlineClosesAndVolumes(
     return {
       closes: klines.map((k) => parseFloat(k[4])),
       volumes: klines.map((k) => parseFloat(k[5])),
+      highs: klines.map((k) => parseFloat(k[2])),
+      lows: klines.map((k) => parseFloat(k[3])),
     };
   } catch {
     return null;

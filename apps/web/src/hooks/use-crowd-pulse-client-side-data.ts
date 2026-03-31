@@ -5,7 +5,8 @@ import { fetchSpotTickers, fetchKlineClosesAndVolumes } from "../lib/api/binance
 import { fetchAllLongShortData } from "../lib/api/binance-futures-long-short-ratio-fetcher";
 import { calculateRSI } from "../lib/rsi-wilder-smoothing-calculator";
 import { calculateCrowdPulseScore, normalizeToHundred } from "../lib/crowd-pulse-score-calculator";
-import type { DashboardData, PriceSnapshot, LongShortData, LongShortAggregated, DataSourceHealth } from "../lib/types";
+import { calculateBuyConclusion } from "../lib/price-level-calculator";
+import type { DashboardData, PriceSnapshot, LongShortData, DataSourceHealth } from "../lib/types";
 
 /** Compute volume anomaly: latest volume vs average of previous candles */
 function computeVolumeAnomaly(volumes: number[]): number | null {
@@ -49,6 +50,8 @@ async function fetchAllData(): Promise<DashboardData> {
   // Calculate RSI + volume anomaly per symbol from klines
   const rsiValues: number[] = [];
   const volumeAnomalies: number[] = [];
+  let btcKlineHighs: number[] = [];
+  let btcKlineLows: number[] = [];
   const prices: PriceSnapshot[] = tickers.map((t, i) => {
     const klineData = klineResults[i] ?? null;
 
@@ -59,25 +62,27 @@ async function fetchAllData(): Promise<DashboardData> {
 
       const anomaly = computeVolumeAnomaly(klineData.volumes);
       if (anomaly !== null) volumeAnomalies.push(anomaly);
+
+      // Store first symbol (BTC) kline highs/lows for support/resistance
+      if (i === 0) {
+        btcKlineHighs = klineData.highs;
+        btcKlineLows = klineData.lows;
+      }
     }
 
     return { ...t, rsi };
   });
 
-  // Long/short ratios — 3 types: global, top trader account, top trader position
-  const longShortRaw: LongShortAggregated = longShortResult.status === "fulfilled"
+  // Long/short ratios — global accounts only
+  const longShortRaw: LongShortData[] = longShortResult.status === "fulfilled"
     ? longShortResult.value
-    : { global: [], topTraderAccount: [], topTraderPosition: [] };
+    : [];
 
-  // Map display names for all 3 types
-  const mapDisplayNames = (data: LongShortData[]) =>
-    data.map((ls) => ({ ...ls, symbol: SYMBOL_DISPLAY_NAMES[ls.symbol] ?? ls.symbol }));
-
-  const longShortDisplay: LongShortAggregated = {
-    global: mapDisplayNames(longShortRaw.global),
-    topTraderAccount: mapDisplayNames(longShortRaw.topTraderAccount),
-    topTraderPosition: mapDisplayNames(longShortRaw.topTraderPosition),
-  };
+  // Map display names
+  const longShortDisplay = longShortRaw.map((ls) => ({
+    ...ls,
+    symbol: SYMBOL_DISPLAY_NAMES[ls.symbol] ?? ls.symbol,
+  }));
 
   // Compute aggregates for score
   const avgRsi = rsiValues.length > 0
@@ -86,7 +91,7 @@ async function fetchAllData(): Promise<DashboardData> {
   const avgVolumeAnomaly = volumeAnomalies.length > 0
     ? volumeAnomalies.reduce((s, v) => s + v, 0) / volumeAnomalies.length
     : null;
-  const normalizedLongShort = normalizeLongShortRatio(longShortRaw.global);
+  const normalizedLongShort = normalizeLongShortRatio(longShortRaw);
 
   // Calculate CrowdPulse score
   const fgValue = fearGreed?.value ?? 50;
@@ -96,6 +101,13 @@ async function fetchAllData(): Promise<DashboardData> {
     volumeAnomaly: avgVolumeAnomaly,
     longShortRatio: normalizedLongShort,
   });
+
+  // Calculate buy conclusion from signal + price levels
+  const btcPrice = prices[0]?.price ?? null;
+  const btcRsi = prices[0]?.rsi ?? null;
+  const buyConclusion = (score !== null && btcPrice !== null && btcKlineHighs.length > 0)
+    ? calculateBuyConclusion(signal, score, btcPrice, btcRsi, btcKlineHighs, btcKlineLows)
+    : null;
 
   return {
     crowdPulse: {
@@ -113,6 +125,7 @@ async function fetchAllData(): Promise<DashboardData> {
     prices,
     longShort: longShortDisplay,
     dataSourceHealth,
+    buyConclusion,
   };
 }
 

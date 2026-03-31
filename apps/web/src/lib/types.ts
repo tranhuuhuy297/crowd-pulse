@@ -20,15 +20,8 @@ export interface LongShortData {
   ratio: number;
 }
 
-/** Aggregated long/short ratios: global accounts + top trader accounts + top trader positions */
-export interface LongShortAggregated {
-  /** Global accounts long/short ratio per symbol */
-  global: LongShortData[];
-  /** Top traders account ratio per symbol */
-  topTraderAccount: LongShortData[];
-  /** Top traders position ratio per symbol */
-  topTraderPosition: LongShortData[];
-}
+/** Global long/short account ratio per symbol from Binance Futures */
+export type LongShortRatios = LongShortData[];
 
 export interface CrowdPulseComponents {
   fearGreed: number;
@@ -51,10 +44,21 @@ export interface DataSourceHealth {
   longShort: boolean;
 }
 
+export interface BuyConclusionData {
+  recommendation: "BUY_NOW" | "WAIT_FOR_DIP" | "HOLD_OFF" | "AVOID";
+  confidence: number;
+  suggestedEntry: number | null;
+  strongSupport: number | null;
+  resistance: number | null;
+  summary: string;
+  currentPrice: number;
+}
+
 export interface DashboardData {
   crowdPulse: CrowdPulseData;
   fearGreed: FearGreedData;
   prices: PriceSnapshot[];
-  longShort: LongShortAggregated;
+  longShort: LongShortRatios;
   dataSourceHealth: DataSourceHealth;
+  buyConclusion: BuyConclusionData | null;
 }

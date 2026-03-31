@@ -1,4 +1,4 @@
-import type { LongShortData, LongShortAggregated } from "../types";
+import type { LongShortData, LongShortRatios } from "../types";
 
 const FUTURES_DATA_BASE = "https://fapi.binance.com/futures/data";
 
@@ -52,19 +52,11 @@ async function fetchRatiosForSymbols(
 }
 
 /**
- * Fetch all 3 long/short ratio types for given symbols:
- * - globalLongShortAccountRatio: all accounts
- * - topLongShortAccountRatio: top traders by account count
- * - topLongShortPositionRatio: top traders by position size
+ * Fetch global long/short account ratio for given symbols.
+ * Uses Binance Futures globalLongShortAccountRatio endpoint.
  */
 export async function fetchAllLongShortData(
   symbols: readonly string[],
-): Promise<LongShortAggregated> {
-  const [global, topTraderAccount, topTraderPosition] = await Promise.all([
-    fetchRatiosForSymbols("globalLongShortAccountRatio", symbols),
-    fetchRatiosForSymbols("topLongShortAccountRatio", symbols),
-    fetchRatiosForSymbols("topLongShortPositionRatio", symbols),
-  ]);
-
-  return { global, topTraderAccount, topTraderPosition };
+): Promise<LongShortRatios> {
+  return fetchRatiosForSymbols("globalLongShortAccountRatio", symbols);
 }

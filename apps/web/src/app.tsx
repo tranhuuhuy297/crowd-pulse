@@ -4,6 +4,7 @@ import { CrowdPulseScoreCard } from "./components/crowd-pulse-score-card";
 import { FearGreedDisplayCard } from "./components/fear-greed-display-card";
 import { LiquidationRatioDisplayCard } from "./components/liquidation-ratio-display-card";
 import { SymbolPriceGrid } from "./components/symbol-price-grid";
+import { BuyConclusionDisplayCard } from "./components/buy-conclusion-display-card";
 import { DashboardLoadingSkeleton } from "./components/dashboard-loading-skeleton";
 import { ThemeToggleButton } from "./components/theme-toggle-button";
 import { formatRelativeTime } from "./lib/number-format-utils";
@@ -79,7 +80,12 @@ export function App() {
               <SymbolPriceGrid prices={data.prices} />
             </div>
 
-            {/* Row 2: Score + Fear & Greed — side by side */}
+            {/* Row 2: Buy conclusion — the actionable answer */}
+            {data.buyConclusion && (
+              <BuyConclusionDisplayCard conclusion={data.buyConclusion} />
+            )}
+
+            {/* Row 3: Score + Fear & Greed — side by side */}
             <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 flex-1 min-h-0">
               <CrowdPulseScoreCard
                 score={data.crowdPulse.score}
