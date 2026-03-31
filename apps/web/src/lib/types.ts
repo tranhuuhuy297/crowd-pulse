@@ -32,6 +32,27 @@ export interface OpenInterestData {
   changePercent: number;
 }
 
+export interface FuturesBasisData {
+  symbol: string;
+  markPrice: number;
+  indexPrice: number;
+  basisPct: number;
+}
+
+export interface TopTraderLongShortData {
+  symbol: string;
+  ratio: number;
+  longPct: number;
+  shortPct: number;
+}
+
+export interface TakerBuySellData {
+  symbol: string;
+  buySellRatio: number;
+  buyVol: number;
+  sellVol: number;
+}
+
 /** Global long/short account ratio per symbol from Binance Futures */
 export type LongShortRatios = LongShortData[];
 
@@ -76,6 +97,9 @@ export interface DashboardData {
   longShort: LongShortRatios;
   fundingRates: FundingRateData[];
   openInterest: OpenInterestData[];
+  futuresBasis: FuturesBasisData[];
+  topTraderLongShort: TopTraderLongShortData[];
+  takerBuySell: TakerBuySellData[];
   dataSourceHealth: DataSourceHealth;
   buyConclusion: BuyConclusionData | null;
 }

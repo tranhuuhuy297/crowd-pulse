@@ -4,6 +4,7 @@ import { fetchSpotTickers, fetchKlineClosesAndVolumes } from "./api/binance-spot
 import { fetchAllLongShortData } from "./api/binance-futures-long-short-ratio-fetcher";
 import { fetchAllFundingRates } from "./api/binance-futures-funding-rate-fetcher";
 import { fetchAllOpenInterest } from "./api/binance-futures-open-interest-fetcher";
+import { fetchAllFuturesBasis, fetchAllTopTraderLongShort, fetchAllTakerBuySell } from "./api/binance-futures-market-data-fetcher";
 import { calculateRSI } from "./rsi-wilder-smoothing-calculator";
 import { calculateCrowdPulseScore, normalizeToHundred } from "./crowd-pulse-score-calculator";
 import { calculateBuyConclusion } from "./price-level-calculator";
@@ -18,13 +19,16 @@ function normalizeLongShortRatio(ratios: LongShortData[]): number | null {
 
 /** Fetch all dashboard data sources in parallel, compute score and buy conclusion */
 export async function fetchAllDashboardData(): Promise<DashboardData> {
-  const [fearGreedResult, tickersResult, klinesResult, longShortResult, fundingRateResult, openInterestResult] = await Promise.allSettled([
+  const [fearGreedResult, tickersResult, klinesResult, longShortResult, fundingRateResult, openInterestResult, basisResult, topTraderResult, takerResult] = await Promise.allSettled([
     fetchFearGreedIndex(),
     fetchSpotTickers(TRACKED_SYMBOLS),
     Promise.all(TRACKED_SYMBOLS.map((s) => fetchKlineClosesAndVolumes(s))),
     fetchAllLongShortData(TRACKED_SYMBOLS),
     fetchAllFundingRates(TRACKED_SYMBOLS),
     fetchAllOpenInterest(TRACKED_SYMBOLS),
+    fetchAllFuturesBasis(TRACKED_SYMBOLS),
+    fetchAllTopTraderLongShort(TRACKED_SYMBOLS),
+    fetchAllTakerBuySell(TRACKED_SYMBOLS),
   ]);
 
   const dataSourceHealth: DataSourceHealth = {
@@ -101,6 +105,9 @@ export async function fetchAllDashboardData(): Promise<DashboardData> {
     },
     fearGreed: fearGreed ?? { value: 0, classification: "Unknown", change24h: null },
     prices, longShort: longShortDisplay, fundingRates: fundingRatesDisplay, openInterest: openInterestDisplay,
+    futuresBasis: basisResult.status === "fulfilled" ? basisResult.value : [],
+    topTraderLongShort: topTraderResult.status === "fulfilled" ? topTraderResult.value : [],
+    takerBuySell: takerResult.status === "fulfilled" ? takerResult.value : [],
     dataSourceHealth, buyConclusion,
   };
 }

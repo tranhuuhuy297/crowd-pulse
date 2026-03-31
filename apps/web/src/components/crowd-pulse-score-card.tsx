@@ -59,7 +59,7 @@ export function CrowdPulseScoreCard({ score, signal, components, scoreDelta }: C
         </div>
       ) : (
         <>
-          <SvgGaugeChart score={score} size={200} />
+          <SvgGaugeChart score={score} size={170} />
           {scoreDelta !== null && (
             <span className={`text-xs font-semibold ${scoreDelta >= 0 ? "text-red-500" : "text-green-500"}`}>
               {scoreDelta >= 0 ? "▲" : "▼"} {Math.abs(scoreDelta).toFixed(1)}

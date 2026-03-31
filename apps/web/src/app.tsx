@@ -5,6 +5,8 @@ import { FearGreedDisplayCard } from "./components/fear-greed-display-card";
 import { LiquidationRatioDisplayCard } from "./components/liquidation-ratio-display-card";
 import { FundingRateDisplayCard } from "./components/funding-rate-display-card";
 import { OpenInterestDisplayCard } from "./components/open-interest-display-card";
+import { FuturesBasisDisplayCard } from "./components/futures-basis-display-card";
+import { TopTraderAndTakerDisplayCard } from "./components/top-trader-and-taker-display-card";
 import { SymbolPriceGrid } from "./components/symbol-price-grid";
 import { BuyConclusionDisplayCard } from "./components/buy-conclusion-display-card";
 import { DashboardLoadingSkeleton } from "./components/dashboard-loading-skeleton";
@@ -38,7 +40,7 @@ export function App() {
   return (
     <div className="h-screen flex flex-col overflow-hidden" style={{ background: "var(--bg-primary)", color: "var(--text-primary)" }}>
       {/* Minimal top bar */}
-      <header className="px-4 py-2 flex items-center justify-between shrink-0">
+      <header className="px-4 py-1.5 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2">
           <span className="text-sm font-bold tracking-tight" style={{ color: "var(--accent)" }}>
             CrowdPulse
@@ -67,7 +69,7 @@ export function App() {
       </header>
 
       {/* Main content — fills remaining space */}
-      <main className="flex-1 px-4 pb-3 max-w-6xl mx-auto w-full flex flex-col gap-3 min-h-0">
+      <main className="flex-1 px-3 pb-2 max-w-7xl mx-auto w-full flex flex-col gap-2 min-h-0">
         {loading && !data && <DashboardLoadingSkeleton />}
 
         {error && !data && (
@@ -79,18 +81,19 @@ export function App() {
 
         {data && (
           <>
-            {/* Row 1: BTC Price hero */}
-            <div className="relative rounded-xl p-3 backdrop-blur-sm overflow-visible hover:z-20 focus-within:z-20" style={{ background: "var(--bg-card)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--bg-card-border)" }}>
-              <SymbolPriceGrid prices={data.prices} />
+            {/* Row 1: BTC Price + Buy Conclusion side by side */}
+            <div className="grid grid-cols-1 gap-2 lg:grid-cols-2 shrink-0">
+              <div className="relative rounded-xl p-2.5 backdrop-blur-sm overflow-visible hover:z-20 focus-within:z-20" style={{ background: "var(--bg-card)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--bg-card-border)" }}>
+                <SymbolPriceGrid prices={data.prices} />
+              </div>
+              {data.buyConclusion && (
+                <BuyConclusionDisplayCard conclusion={data.buyConclusion} />
+              )}
             </div>
 
-            {/* Row 2: Buy conclusion — the actionable answer */}
-            {data.buyConclusion && (
-              <BuyConclusionDisplayCard conclusion={data.buyConclusion} />
-            )}
-
-            {/* Row 3: Score + 4 metric cards (2x2 grid on right) */}
-            <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 flex-1 min-h-0">
+            {/* Row 2: 3-column layout — Score | Metrics | Smart Money */}
+            <div className="grid grid-cols-1 gap-2 lg:grid-cols-3 flex-1 min-h-0">
+              {/* Col 1: Contrarian Signal */}
               <CrowdPulseScoreCard
                 score={data.crowdPulse.score}
                 signal={data.crowdPulse.signal}
@@ -98,7 +101,9 @@ export function App() {
                 components={data.crowdPulse.components}
                 scoreDelta={scoreDelta}
               />
-              <div className="flex flex-col gap-3 min-h-0">
+
+              {/* Col 2: Core metrics */}
+              <div className="flex flex-col gap-2 min-h-0">
                 <FearGreedDisplayCard
                   value={data.fearGreed.value}
                   classification={data.fearGreed.classification}
@@ -106,10 +111,16 @@ export function App() {
                   className="flex-1"
                 />
                 <LiquidationRatioDisplayCard longShort={data.longShort} className="flex-1" />
-                <div className="grid grid-cols-2 gap-3 flex-1">
+                <div className="grid grid-cols-2 gap-2 flex-1">
                   <FundingRateDisplayCard fundingRates={data.fundingRates} className="flex-1" />
                   <OpenInterestDisplayCard openInterest={data.openInterest} className="flex-1" />
                 </div>
+              </div>
+
+              {/* Col 3: Smart money indicators */}
+              <div className="flex flex-col gap-2 min-h-0">
+                <FuturesBasisDisplayCard futuresBasis={data.futuresBasis} className="flex-1" />
+                <TopTraderAndTakerDisplayCard topTrader={data.topTraderLongShort} takerBuySell={data.takerBuySell} className="flex-1" />
               </div>
             </div>
           </>
@@ -117,7 +128,7 @@ export function App() {
       </main>
 
       {/* Tiny footer */}
-      <footer className="px-4 py-1.5 text-center shrink-0">
+      <footer className="px-4 py-1 text-center shrink-0">
         <p className="text-xs" style={{ color: "var(--text-faint)" }}>
           Fear & Greed Index · Binance Spot & Futures · 60s refresh
         </p>
