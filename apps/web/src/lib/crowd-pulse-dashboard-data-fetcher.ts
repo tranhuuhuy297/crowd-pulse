@@ -8,16 +8,82 @@ import { fetchAllFuturesBasis, fetchAllTopTraderLongShort, fetchAllTakerBuySell 
 import { calculateRSI } from "./rsi-wilder-smoothing-calculator";
 import { calculateCrowdPulseScore, normalizeToHundred } from "./crowd-pulse-score-calculator";
 import { calculateBuyConclusion } from "./price-level-calculator";
-import type { DashboardData, PriceSnapshot, LongShortData, FundingRateData, OpenInterestData, DataSourceHealth } from "./types";
+import type {
+  DashboardData, PriceSnapshot, LongShortData, FundingRateData,
+  OpenInterestData, DataSourceHealth, AssetDashboardData,
+} from "./types";
 
 /** Normalize long/short ratio: [0.5, 2.0] -> [0, 100] */
-function normalizeLongShortRatio(ratios: LongShortData[]): number | null {
-  if (ratios.length === 0) return null;
-  const avg = ratios.reduce((s, r) => s + r.ratio, 0) / ratios.length;
-  return normalizeToHundred(avg, 0.7, 1.5);
+function normalizeLongShortRatio(ratio: number): number {
+  return normalizeToHundred(ratio, 0.7, 1.5);
 }
 
-/** Fetch all dashboard data sources in parallel, compute score and buy conclusion */
+/** Build per-asset dashboard data from raw arrays */
+function buildAssetData(
+  symbol: string,
+  displayName: string,
+  prices: PriceSnapshot[],
+  klineResults: (Awaited<ReturnType<typeof fetchKlineClosesAndVolumes>> | null)[],
+  symbolIndex: number,
+  longShortRaw: LongShortData[],
+  fundingRatesRaw: FundingRateData[],
+  openInterestRaw: OpenInterestData[],
+  futuresBasisRaw: { symbol: string; markPrice: number; indexPrice: number; basisPct: number }[],
+  topTraderRaw: { symbol: string; ratio: number; longPct: number; shortPct: number }[],
+  takerRaw: { symbol: string; buySellRatio: number; buyVol: number; sellVol: number }[],
+  fearGreedValue: number,
+): AssetDashboardData {
+  const price = prices[symbolIndex] ?? null;
+  const klineData = klineResults[symbolIndex] ?? null;
+
+  // Per-asset metrics — some fetchers return raw symbol (BTCUSDT), others display name (BTC)
+  const match = (d: { symbol: string }) => d.symbol === symbol || d.symbol === displayName;
+  const ls = longShortRaw.find(match) ?? null;
+  const fr = fundingRatesRaw.find(match) ?? null;
+  const oi = openInterestRaw.find(match) ?? null;
+  const basis = futuresBasisRaw.find(match) ?? null;
+  const tt = topTraderRaw.find(match) ?? null;
+  const tk = takerRaw.find(match) ?? null;
+
+  // Normalize components for score
+  const normalizedLS = ls ? normalizeLongShortRatio(ls.ratio) : null;
+  const normalizedFR = fr ? normalizeToHundred(fr.rate, -0.0003, 0.0005) : null;
+  const normalizedOI = oi ? normalizeToHundred(oi.changePercent, -20, 20) : null;
+  const rsi = klineData ? calculateRSI(klineData.closes) : null;
+
+  const { score, signal } = calculateCrowdPulseScore({
+    fearGreed: fearGreedValue,
+    avgRsi: rsi,
+    longShortRatio: normalizedLS,
+    fundingRate: normalizedFR,
+    openInterest: normalizedOI,
+  });
+
+  // Buy conclusion from price levels
+  const buyConclusion =
+    score !== null && price && klineData && klineData.highs.length > 0
+      ? calculateBuyConclusion(signal, score, price.price, rsi, klineData.highs, klineData.lows, fr?.rate ?? null)
+      : null;
+
+  return {
+    crowdPulse: {
+      score,
+      signal,
+      updatedAt: new Date().toISOString(),
+      components: { fearGreed: fearGreedValue, avgRsi: rsi, longShortRatio: normalizedLS, fundingRate: normalizedFR, openInterest: normalizedOI },
+    },
+    price,
+    longShort: ls ? { ...ls, symbol: displayName } : null,
+    fundingRate: fr ? { ...fr, symbol: displayName } : null,
+    openInterest: oi ? { ...oi, symbol: displayName } : null,
+    futuresBasis: basis ? { ...basis, symbol: displayName } : null,
+    topTraderLongShort: tt ? { ...tt, symbol: displayName } : null,
+    takerBuySell: tk ? { ...tk, symbol: displayName } : null,
+    buyConclusion,
+  };
+}
+
+/** Fetch all dashboard data sources in parallel, compute per-asset scores */
 export async function fetchAllDashboardData(): Promise<DashboardData> {
   const [fearGreedResult, tickersResult, klinesResult, longShortResult, fundingRateResult, openInterestResult, basisResult, topTraderResult, takerResult] = await Promise.allSettled([
     fetchFearGreedIndex(),
@@ -43,71 +109,38 @@ export async function fetchAllDashboardData(): Promise<DashboardData> {
   const fearGreed = fearGreedResult.status === "fulfilled" ? fearGreedResult.value : null;
   const tickers = tickersResult.status === "fulfilled" ? tickersResult.value : [];
   const klineResults = klinesResult.status === "fulfilled" ? klinesResult.value : [];
+  const longShortRaw = longShortResult.status === "fulfilled" ? longShortResult.value : [];
+  const fundingRatesRaw = fundingRateResult.status === "fulfilled" ? fundingRateResult.value : [];
+  const openInterestRaw = openInterestResult.status === "fulfilled" ? openInterestResult.value : [];
+  const futuresBasisRaw = basisResult.status === "fulfilled" ? basisResult.value : [];
+  const topTraderRaw = topTraderResult.status === "fulfilled" ? topTraderResult.value : [];
+  const takerRaw = takerResult.status === "fulfilled" ? takerResult.value : [];
 
-  // Calculate RSI per symbol from klines
-  const rsiValues: number[] = [];
-  let btcKlineHighs: number[] = [];
-  let btcKlineLows: number[] = [];
+  const fgValue = fearGreed?.value ?? 50;
+
+  // Build prices with RSI
   const prices: PriceSnapshot[] = tickers.map((t, i) => {
     const klineData = klineResults[i] ?? null;
-    let rsi: number | null = null;
-    if (klineData) {
-      rsi = calculateRSI(klineData.closes);
-      if (rsi !== null) rsiValues.push(rsi);
-      if (i === 0) {
-        btcKlineHighs = klineData.highs;
-        btcKlineLows = klineData.lows;
-      }
-    }
+    const rsi = klineData ? calculateRSI(klineData.closes) : null;
     return { ...t, rsi };
   });
 
-  // Extract and map display names for each data source
-  const longShortRaw: LongShortData[] = longShortResult.status === "fulfilled" ? longShortResult.value : [];
-  const longShortDisplay = longShortRaw.map((ls) => ({ ...ls, symbol: SYMBOL_DISPLAY_NAMES[ls.symbol] ?? ls.symbol }));
-
-  const fundingRatesRaw: FundingRateData[] = fundingRateResult.status === "fulfilled" ? fundingRateResult.value : [];
-  const fundingRatesDisplay = fundingRatesRaw.map((fr) => ({ ...fr, symbol: SYMBOL_DISPLAY_NAMES[fr.symbol] ?? fr.symbol }));
-
-  const openInterestRaw: OpenInterestData[] = openInterestResult.status === "fulfilled" ? openInterestResult.value : [];
-  const openInterestDisplay = openInterestRaw.map((oi) => ({ ...oi, symbol: SYMBOL_DISPLAY_NAMES[oi.symbol] ?? oi.symbol }));
-
-  // Compute aggregates for score
-  const avgRsi = rsiValues.length > 0 ? rsiValues.reduce((s, v) => s + v, 0) / rsiValues.length : null;
-  const normalizedLongShort = normalizeLongShortRatio(longShortRaw);
-
-  const avgFundingRate = fundingRatesRaw.length > 0
-    ? fundingRatesRaw.reduce((s, fr) => s + fr.rate, 0) / fundingRatesRaw.length : null;
-  const normalizedFundingRate = avgFundingRate !== null ? normalizeToHundred(avgFundingRate, -0.0003, 0.0005) : null;
-
-  const avgOIChange = openInterestRaw.length > 0
-    ? openInterestRaw.reduce((s, oi) => s + oi.changePercent, 0) / openInterestRaw.length : null;
-  const normalizedOI = avgOIChange !== null ? normalizeToHundred(avgOIChange, -20, 20) : null;
-
-  // Lookup BTC by symbol — not by index — to avoid wrong-coin bugs if TRACKED_SYMBOLS reorders
-  const btcIndex = TRACKED_SYMBOLS.indexOf("BTCUSDT");
-  const btcPrice = btcIndex >= 0 ? (prices[btcIndex]?.price ?? null) : null;
-  const btcRsi = btcIndex >= 0 ? (prices[btcIndex]?.rsi ?? null) : null;
-
-  const fgValue = fearGreed?.value ?? 50; // neutral fallback when F&G API fails — weight still applied
-  const { score, signal } = calculateCrowdPulseScore({
-    fearGreed: fgValue, avgRsi,
-    longShortRatio: normalizedLongShort, fundingRate: normalizedFundingRate, openInterest: normalizedOI,
-  });
-
-  const buyConclusion = (score !== null && btcPrice !== null && btcKlineHighs.length > 0)
-    ? calculateBuyConclusion(signal, score, btcPrice, btcRsi, btcKlineHighs, btcKlineLows, avgFundingRate) : null;
+  // Build per-asset data
+  const assets: Record<string, AssetDashboardData> = {};
+  for (let i = 0; i < TRACKED_SYMBOLS.length; i++) {
+    const symbol = TRACKED_SYMBOLS[i]!;
+    const displayName = SYMBOL_DISPLAY_NAMES[symbol] ?? symbol;
+    assets[displayName] = buildAssetData(
+      symbol, displayName, prices, klineResults, i,
+      longShortRaw, fundingRatesRaw, openInterestRaw,
+      futuresBasisRaw, topTraderRaw, takerRaw, fgValue,
+    );
+  }
 
   return {
-    crowdPulse: {
-      score, signal, updatedAt: new Date().toISOString(),
-      components: { fearGreed: fgValue, avgRsi, longShortRatio: normalizedLongShort, fundingRate: normalizedFundingRate, openInterest: normalizedOI },
-    },
+    assets,
     fearGreed: fearGreed ?? { value: 0, classification: "Unknown", change24h: null },
-    prices, longShort: longShortDisplay, fundingRates: fundingRatesDisplay, openInterest: openInterestDisplay,
-    futuresBasis: basisResult.status === "fulfilled" ? basisResult.value : [],
-    topTraderLongShort: topTraderResult.status === "fulfilled" ? topTraderResult.value : [],
-    takerBuySell: takerResult.status === "fulfilled" ? takerResult.value : [],
-    dataSourceHealth, buyConclusion,
+    prices,
+    dataSourceHealth,
   };
 }

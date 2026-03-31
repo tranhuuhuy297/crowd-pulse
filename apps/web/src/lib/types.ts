@@ -90,16 +90,26 @@ export interface BuyConclusionData {
   currentPrice: number;
 }
 
-export interface DashboardData {
+/** Per-asset dashboard data (filtered view for one symbol) */
+export interface AssetDashboardData {
   crowdPulse: CrowdPulseData;
-  fearGreed: FearGreedData;
-  prices: PriceSnapshot[];
-  longShort: LongShortRatios;
-  fundingRates: FundingRateData[];
-  openInterest: OpenInterestData[];
-  futuresBasis: FuturesBasisData[];
-  topTraderLongShort: TopTraderLongShortData[];
-  takerBuySell: TakerBuySellData[];
-  dataSourceHealth: DataSourceHealth;
+  price: PriceSnapshot | null;
+  longShort: LongShortData | null;
+  fundingRate: FundingRateData | null;
+  openInterest: OpenInterestData | null;
+  futuresBasis: FuturesBasisData | null;
+  topTraderLongShort: TopTraderLongShortData | null;
+  takerBuySell: TakerBuySellData | null;
   buyConclusion: BuyConclusionData | null;
+}
+
+/** Full dashboard data with all assets + shared data */
+export interface DashboardData {
+  /** Per-asset data keyed by display name (BTC, ETH, etc.) */
+  assets: Record<string, AssetDashboardData>;
+  /** Fear & Greed is shared across all assets (crypto-wide index) */
+  fearGreed: FearGreedData;
+  /** All prices for the top price grid */
+  prices: PriceSnapshot[];
+  dataSourceHealth: DataSourceHealth;
 }

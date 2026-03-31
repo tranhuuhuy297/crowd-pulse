@@ -3,26 +3,36 @@ import { fetchAllDashboardData } from "../lib/crowd-pulse-dashboard-data-fetcher
 import type { DashboardData } from "../lib/types";
 
 /**
- * Hook that fetches data from public APIs, calculates CrowdPulse score client-side.
- * Polls every refreshMs (default 60s). No backend needed.
+ * Hook that fetches all asset data from public APIs, calculates per-asset CrowdPulse scores.
+ * Polls every refreshMs (default 60s). Tracks per-asset score deltas.
  */
 export function useCrowdPulseData(refreshMs = 60_000) {
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [scoreDelta, setScoreDelta] = useState<number | null>(null);
+  /** Per-asset score deltas keyed by display name */
+  const [scoreDeltas, setScoreDeltas] = useState<Record<string, number | null>>({});
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const prevScoreRef = useRef<number | null>(null);
+  const prevScoresRef = useRef<Record<string, number | null>>({});
 
   const refresh = useCallback(async () => {
     try {
       const result = await fetchAllDashboardData();
       setData(result);
       setError(null);
-      if (result.crowdPulse.score !== null && prevScoreRef.current !== null) {
-        setScoreDelta(result.crowdPulse.score - prevScoreRef.current);
+
+      // Compute per-asset score deltas
+      const newDeltas: Record<string, number | null> = {};
+      for (const [name, asset] of Object.entries(result.assets)) {
+        const prev = prevScoresRef.current[name];
+        if (asset.crowdPulse.score !== null && prev !== null && prev !== undefined) {
+          newDeltas[name] = asset.crowdPulse.score - prev;
+        } else {
+          newDeltas[name] = null;
+        }
+        prevScoresRef.current[name] = asset.crowdPulse.score;
       }
-      prevScoreRef.current = result.crowdPulse.score;
+      setScoreDeltas(newDeltas);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch data");
     } finally {
@@ -38,5 +48,5 @@ export function useCrowdPulseData(refreshMs = 60_000) {
     };
   }, [refresh, refreshMs]);
 
-  return { data, loading, error, scoreDelta };
+  return { data, loading, error, scoreDeltas };
 }

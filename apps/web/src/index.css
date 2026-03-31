@@ -24,6 +24,9 @@
   --gauge-needle: #292524;
   --gauge-score-text: #1c1917;
   --gauge-label-text: #78716c;
+  --bg-secondary: rgba(245, 245, 244, 0.8);
+  --bg-tertiary: rgba(168, 162, 158, 0.15);
+  --border: rgba(168, 162, 158, 0.35);
   --accent: #d97706;
   --accent-rgb: 217, 119, 6;
 }
@@ -44,6 +47,9 @@
   --gauge-needle: #e5e5e5;
   --gauge-score-text: #e5e5e5;
   --gauge-label-text: #737373;
+  --bg-secondary: rgba(26, 26, 26, 0.8);
+  --bg-tertiary: rgba(38, 38, 38, 0.6);
+  --border: rgba(42, 42, 42, 0.6);
   --accent: #f59e0b;
   --accent-rgb: 245, 158, 11;
 }
@@ -70,6 +76,12 @@ code, pre, kbd, samp {
 
 .pulse-buy-now {
   animation: pulse-border 3s ease-in-out infinite;
+}
+
+/* Asset switch hero fade+slide animation */
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @media (prefers-reduced-motion: reduce) {
