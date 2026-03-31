@@ -6,29 +6,30 @@
 @import "@fontsource/space-grotesk/700.css";
 @import "@fontsource/space-mono/400.css";
 
-/* Light theme — warm paper, monochrome + amber accent */
+/* Light theme — cool slate with depth and stronger card contrast */
 :root {
   --font-body: "Space Grotesk", system-ui, -apple-system, sans-serif;
   --font-code: "Space Mono", ui-monospace, monospace;
-  --bg-primary: #f5f5f4;
-  --bg-card: rgba(255, 255, 255, 0.92);
-  --bg-card-border: rgba(168, 162, 158, 0.35);
-  --bg-track: rgba(168, 162, 158, 0.3);
-  --bg-skeleton: rgba(168, 162, 158, 0.3);
-  --text-primary: #0c0a09;
-  --text-secondary: #292524;
-  --text-muted: #57534e;
-  --text-faint: #78716c;
-  --divider: rgba(168, 162, 158, 0.35);
-  --gauge-track: #d6d3d1;
-  --gauge-needle: #292524;
-  --gauge-score-text: #1c1917;
-  --gauge-label-text: #78716c;
-  --bg-secondary: rgba(245, 245, 244, 0.8);
-  --bg-tertiary: rgba(168, 162, 158, 0.15);
-  --border: rgba(168, 162, 158, 0.35);
-  --accent: #d97706;
-  --accent-rgb: 217, 119, 6;
+  --bg-primary: #eeeef0;
+  --bg-card: rgba(255, 255, 255, 0.96);
+  --bg-card-border: rgba(140, 140, 160, 0.2);
+  --bg-track: rgba(140, 140, 160, 0.2);
+  --bg-skeleton: rgba(140, 140, 160, 0.2);
+  --text-primary: #1a1a2e;
+  --text-secondary: #2d2d44;
+  --text-muted: #5c5c72;
+  --text-faint: #8888a0;
+  --divider: rgba(140, 140, 160, 0.18);
+  --gauge-track: #d4d4dc;
+  --gauge-needle: #2d2d44;
+  --gauge-score-text: #1a1a2e;
+  --gauge-label-text: #8888a0;
+  --bg-secondary: rgba(255, 255, 255, 0.7);
+  --bg-tertiary: rgba(140, 140, 160, 0.1);
+  --border: rgba(140, 140, 160, 0.2);
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 12px rgba(0, 0, 0, 0.04);
+  --accent: #c2410c;
+  --accent-rgb: 194, 65, 12;
 }
 
 /* Dark theme — charcoal, monochrome + amber accent */
@@ -50,6 +51,7 @@
   --bg-secondary: rgba(26, 26, 26, 0.8);
   --bg-tertiary: rgba(38, 38, 38, 0.6);
   --border: rgba(42, 42, 42, 0.6);
+  --card-shadow: none;
   --accent: #f59e0b;
   --accent-rgb: 245, 158, 11;
 }

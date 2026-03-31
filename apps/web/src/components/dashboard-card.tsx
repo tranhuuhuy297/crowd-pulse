@@ -12,6 +12,7 @@ const DEFAULT_STYLE: React.CSSProperties = {
   borderWidth: 1,
   borderStyle: "solid",
   borderColor: "var(--bg-card-border)",
+  boxShadow: "var(--card-shadow)",
 };
 
 /** Shared card wrapper — replaces duplicated card chrome across all dashboard cards */
