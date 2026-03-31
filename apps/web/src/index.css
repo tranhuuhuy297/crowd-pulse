@@ -63,9 +63,37 @@ code, pre, kbd, samp {
   font-family: var(--font-code);
 }
 
-/* Card hover effect — subtle amber border accent */
+/* Card hover — border glow pulse + inner radial highlight */
+.hover-card {
+  transition: box-shadow 0.4s ease, border-color 0.3s ease;
+}
+
+.hover-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle at 50% 0%,
+    rgba(var(--accent-rgb), 0.08) 0%,
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  z-index: 0;
+}
+
 .hover-card:hover {
-  border-color: rgba(var(--accent-rgb), 0.3) !important;
+  border-color: rgba(var(--accent-rgb), 0.4) !important;
+  box-shadow:
+    0 0 0 1px rgba(var(--accent-rgb), 0.1),
+    0 0 20px rgba(var(--accent-rgb), 0.1),
+    inset 0 1px 0 rgba(var(--accent-rgb), 0.08);
+}
+
+.hover-card:hover::before {
+  opacity: 1;
 }
 
 /* BUY_NOW pulsing green glow */
@@ -85,7 +113,7 @@ code, pre, kbd, samp {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pulse-buy-now {
-    animation: none;
-  }
+  .pulse-buy-now { animation: none; }
+  .hover-card { transition: none; }
+  .hover-card::before { display: none; }
 }
