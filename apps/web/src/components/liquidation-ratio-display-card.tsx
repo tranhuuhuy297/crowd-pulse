@@ -36,7 +36,7 @@ function biasStyle(ratio: number): string {
   return "bg-green-500/20 text-green-400 border-green-500/30";
 }
 
-const TOOLTIP = "All Binance Futures accounts: longs vs shorts. Ratio >1 = bullish crowd.";
+const TOOLTIP = "Longs vs shorts. Ratio >1 = bullish crowd.";
 
 /** Compact card showing global long/short account ratio */
 export function LiquidationRatioDisplayCard({ longShort, className = "" }: Props) {

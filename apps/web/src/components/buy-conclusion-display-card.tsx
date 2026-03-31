@@ -76,9 +76,9 @@ export function BuyConclusionDisplayCard({ conclusion }: BuyConclusionDisplayCar
       <div className="relative flex items-center gap-4 flex-wrap">
         {/* Left: recommendation label */}
         <div className="flex flex-col shrink-0">
-          <span className="text-xs font-semibold uppercase tracking-wider flex items-center gap-1" style={{ color: "var(--text-primary)" }}>
+          <span className="text-xs font-semibold uppercase tracking-wider flex items-center gap-1" style={{ color: "var(--text-muted)" }}>
             Should you buy?
-            <InfoTooltip content="Combines: (1) Crowd sentiment — Fear & Greed Index, Long/Short ratio, RSI, volume anomaly. (2) Technical levels — swing support/resistance from 100x 4h candles (~17 days). RSI oversold/overbought boosts confidence. Not financial advice." />
+            <InfoTooltip content="Sentiment + support/resistance. NFA." />
           </span>
           <span className={`text-xl font-bold tracking-tight ${c.labelColor}`}>{c.label}</span>
         </div>

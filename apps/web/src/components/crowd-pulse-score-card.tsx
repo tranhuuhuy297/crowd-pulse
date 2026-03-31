@@ -45,7 +45,7 @@ export function CrowdPulseScoreCard({ score, signal, components, scoreDelta }: C
       <div className="flex items-center justify-between w-full">
         <h2 className="text-xs font-semibold uppercase tracking-wider flex items-center gap-1" style={{ color: "var(--text-muted)" }}>
           Crowd Pulse
-          <InfoTooltip content="Composite sentiment score (0-100). Formula: F&G×35% + RSI×25% + Volume×20% + L/S×20%. Weights auto-redistribute when sources unavailable." />
+          <InfoTooltip content="Sentiment score 0-100. F&G 35% + RSI 25% + Vol 20% + L/S 20%." />
         </h2>
         <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${style.badge}`}>
           {style.label}
@@ -70,7 +70,7 @@ export function CrowdPulseScoreCard({ score, signal, components, scoreDelta }: C
 
       <div className={`w-full rounded-lg border px-3 py-1.5 flex items-center justify-center gap-1 ${SIGNAL_BANNER[signal]}`}>
         <p className="text-xs italic" style={{ color: "var(--text-secondary)" }}>{message}</p>
-        <InfoTooltip content="Contrarian signal: when crowd is greedy (80+), consider selling. When fearful (<20), consider buying." />
+        <InfoTooltip content="Greedy crowd (80+) → sell. Fearful crowd (<20) → buy." />
       </div>
 
       <ScoreComponentBreakdown components={components} />

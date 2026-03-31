@@ -80,7 +80,7 @@ export function SymbolPriceGrid({ prices }: SymbolPriceGridProps) {
           <div className="flex flex-col items-center">
             <span className="text-xs uppercase flex items-center gap-0.5" style={{ color: "var(--text-muted)" }}>
               RSI
-              <InfoTooltip placement="bottom" content="Relative Strength Index (14-period Wilder). >70 = overbought, <30 = oversold. From hourly candles." />
+              <InfoTooltip placement="bottom" content="RSI-14. >70 overbought, <30 oversold." />
             </span>
             <span className={`text-sm font-semibold ${rsiColor}`} style={rsiColor ? undefined : { color: "var(--text-secondary)" }}>{btc.rsi.toFixed(1)}</span>
           </div>
@@ -89,7 +89,7 @@ export function SymbolPriceGrid({ prices }: SymbolPriceGridProps) {
           <div className="flex flex-col items-center">
             <span className="text-xs uppercase flex items-center gap-0.5" style={{ color: "var(--text-muted)" }}>
               Volume
-              <InfoTooltip placement="bottom" content="BTC/USDT spot trading volume in last 24 hours. Source: Binance." />
+              <InfoTooltip placement="bottom" content="24h spot volume from Binance." />
             </span>
             <span className="text-sm font-semibold" style={{ color: "var(--text-secondary)" }}>{formatVolume(btc.volume24h)}</span>
           </div>
