@@ -60,6 +60,7 @@ export function calculateBuyConclusion(
   rsi: number | null,
   highs: number[],
   lows: number[],
+  avgFundingRate: number | null = null,
 ): BuyConclusion {
   // Find support/resistance from swing levels
   const swingLows = findSwingLows(lows, 2);
@@ -130,6 +131,20 @@ export function calculateBuyConclusion(
     confidence = Math.min(confidence + 10, 95);
   } else if (rsiContext === "overbought" && (signal === "SELL" || signal === "STRONG_SELL")) {
     confidence = Math.min(confidence + 10, 95);
+  }
+
+  // Adjust confidence based on funding rate alignment
+  if (avgFundingRate !== null) {
+    const isNegativeFunding = avgFundingRate < -0.0001;
+    const isPositiveFunding = avgFundingRate > 0.0005;
+
+    if (isNegativeFunding && (signal === "STRONG_BUY" || signal === "BUY")) {
+      confidence = Math.min(confidence + 10, 95);
+      summary += " Funding negative — shorts paying longs.";
+    } else if (isPositiveFunding && (signal === "SELL" || signal === "STRONG_SELL")) {
+      confidence = Math.min(confidence + 5, 95);
+      summary += " Funding elevated — longs paying shorts.";
+    }
   }
 
   return {

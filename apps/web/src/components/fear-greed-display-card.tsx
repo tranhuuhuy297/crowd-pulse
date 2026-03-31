@@ -5,6 +5,7 @@ interface FearGreedDisplayCardProps {
   value: number;
   classification: string;
   change24h: number | null;
+  className?: string;
 }
 
 /** Returns progress bar color — green (fear) to red (greed) */
@@ -26,13 +27,13 @@ function getValueColor(value: number): string {
 }
 
 /** Compact Fear & Greed index card */
-export function FearGreedDisplayCard({ value, classification, change24h }: FearGreedDisplayCardProps) {
+export function FearGreedDisplayCard({ value, classification, change24h, className = "" }: FearGreedDisplayCardProps) {
   const barColor = getBarColor(value);
   const valueColor = getValueColor(value);
   const isPositiveChange = change24h !== null && change24h >= 0;
 
   return (
-    <div className="relative rounded-xl p-4 flex flex-col gap-2 backdrop-blur-sm overflow-visible hover:z-20 focus-within:z-20" style={{ background: "var(--bg-card)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--bg-card-border)" }}>
+    <div className={`relative rounded-xl p-3 flex flex-col gap-1.5 backdrop-blur-sm overflow-visible hover:z-20 focus-within:z-20 ${className}`} style={{ background: "var(--bg-card)", borderWidth: 1, borderStyle: "solid", borderColor: "var(--bg-card-border)" }}>
       <h2 className="text-xs font-semibold uppercase tracking-wider flex items-center gap-1" style={{ color: "var(--text-muted)" }}>
         Market Sentiment
         <InfoTooltip content="alternative.me Fear & Greed Index. One of 4 inputs to Contrarian Signal." />
@@ -40,7 +41,7 @@ export function FearGreedDisplayCard({ value, classification, change24h }: FearG
 
       <div className="flex items-end justify-between">
         <div>
-          <span className={`text-4xl font-bold ${valueColor}`}>{value}</span>
+          <span className={`text-2xl font-bold ${valueColor}`}>{value}</span>
           <span className="text-xs ml-1" style={{ color: "var(--text-muted)" }}>/ 100</span>
         </div>
         <div className="text-right">
@@ -60,9 +61,9 @@ export function FearGreedDisplayCard({ value, classification, change24h }: FearG
         />
       </div>
 
-      <div className="flex justify-between text-xs" style={{ color: "var(--text-muted)" }}>
-        <span>Extreme Fear</span>
-        <span>Extreme Greed</span>
+      <div className="flex justify-between text-xs" style={{ color: "var(--text-faint)" }}>
+        <span>Fear</span>
+        <span>Greed</span>
       </div>
     </div>
   );

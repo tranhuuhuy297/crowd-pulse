@@ -11,7 +11,6 @@ export interface PriceSnapshot {
   symbol: string;
   price: number;
   change24hPct: number;
-  volume24h: number;
   rsi: number | null;
 }
 
@@ -20,14 +19,28 @@ export interface LongShortData {
   ratio: number;
 }
 
+export interface FundingRateData {
+  symbol: string;
+  rate: number;
+  timestamp: number;
+}
+
+export interface OpenInterestData {
+  symbol: string;
+  currentOI: number;
+  avgOI: number;
+  changePercent: number;
+}
+
 /** Global long/short account ratio per symbol from Binance Futures */
 export type LongShortRatios = LongShortData[];
 
 export interface CrowdPulseComponents {
   fearGreed: number;
   avgRsi: number | null;
-  volumeAnomaly: number | null;
   longShortRatio: number | null;
+  fundingRate: number | null;
+  openInterest: number | null;
 }
 
 export interface CrowdPulseData {
@@ -42,6 +55,8 @@ export interface DataSourceHealth {
   prices: boolean;
   klines: boolean;
   longShort: boolean;
+  fundingRate: boolean;
+  openInterest: boolean;
 }
 
 export interface BuyConclusionData {
@@ -59,6 +74,8 @@ export interface DashboardData {
   fearGreed: FearGreedData;
   prices: PriceSnapshot[];
   longShort: LongShortRatios;
+  fundingRates: FundingRateData[];
+  openInterest: OpenInterestData[];
   dataSourceHealth: DataSourceHealth;
   buyConclusion: BuyConclusionData | null;
 }

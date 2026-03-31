@@ -3,6 +3,8 @@ import { useThemeToggle } from "./hooks/use-theme-toggle";
 import { CrowdPulseScoreCard } from "./components/crowd-pulse-score-card";
 import { FearGreedDisplayCard } from "./components/fear-greed-display-card";
 import { LiquidationRatioDisplayCard } from "./components/liquidation-ratio-display-card";
+import { FundingRateDisplayCard } from "./components/funding-rate-display-card";
+import { OpenInterestDisplayCard } from "./components/open-interest-display-card";
 import { SymbolPriceGrid } from "./components/symbol-price-grid";
 import { BuyConclusionDisplayCard } from "./components/buy-conclusion-display-card";
 import { DashboardLoadingSkeleton } from "./components/dashboard-loading-skeleton";
@@ -10,11 +12,11 @@ import { ThemeToggleButton } from "./components/theme-toggle-button";
 import { formatRelativeTime } from "./lib/number-format-utils";
 import type { DataSourceHealth } from "./lib/types";
 
-/** Health dot: green = all OK, yellow = 1-2 failed, red = 3-4 failed */
+/** Health dot: green = all OK, yellow = some failed, red = most failed */
 function healthDotColor(health: DataSourceHealth): string {
-  const ok = [health.fearGreed, health.prices, health.klines, health.longShort].filter(Boolean).length;
-  if (ok === 4) return "bg-green-500";
-  if (ok >= 2) return "bg-amber-500 animate-pulse";
+  const ok = [health.fearGreed, health.prices, health.klines, health.longShort, health.fundingRate, health.openInterest].filter(Boolean).length;
+  if (ok === 6) return "bg-green-500";
+  if (ok >= 3) return "bg-amber-500 animate-pulse";
   return "bg-red-500 animate-pulse";
 }
 
@@ -24,6 +26,8 @@ function failedSources(health: DataSourceHealth): string[] {
   if (!health.prices) names.push("Spot Prices");
   if (!health.klines) names.push("Klines/RSI");
   if (!health.longShort) names.push("Long/Short");
+  if (!health.fundingRate) names.push("Funding Rate");
+  if (!health.openInterest) names.push("Open Interest");
   return names;
 }
 
@@ -85,7 +89,7 @@ export function App() {
               <BuyConclusionDisplayCard conclusion={data.buyConclusion} />
             )}
 
-            {/* Row 3: Score + Fear & Greed — side by side */}
+            {/* Row 3: Score + 4 metric cards (2x2 grid on right) */}
             <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 flex-1 min-h-0">
               <CrowdPulseScoreCard
                 score={data.crowdPulse.score}
@@ -99,8 +103,13 @@ export function App() {
                   value={data.fearGreed.value}
                   classification={data.fearGreed.classification}
                   change24h={data.fearGreed.change24h}
+                  className="flex-1"
                 />
                 <LiquidationRatioDisplayCard longShort={data.longShort} className="flex-1" />
+                <div className="grid grid-cols-2 gap-3 flex-1">
+                  <FundingRateDisplayCard fundingRates={data.fundingRates} className="flex-1" />
+                  <OpenInterestDisplayCard openInterest={data.openInterest} className="flex-1" />
+                </div>
               </div>
             </div>
           </>

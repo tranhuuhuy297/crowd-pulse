@@ -30,14 +30,14 @@ export function DashboardLoadingSkeleton() {
         </div>
       </SkeletonCard>
 
-      {/* Row 2: Score + Fear&Greed/LongShort */}
+      {/* Row 2: Score + 2x2 metric cards */}
       <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 flex-1">
         <SkeletonCard>
           <SkeletonBlock className="h-3 w-24" />
           <SkeletonBlock className="h-28 w-28 rounded-full mx-auto" />
           <SkeletonBlock className="h-7 w-full rounded-lg" />
           <div className="flex flex-col gap-1.5">
-            {[1, 2, 3, 4].map((i) => (
+            {[1, 2, 3, 4, 5].map((i) => (
               <div key={i} className="flex items-center gap-2">
                 <SkeletonBlock className="h-2.5 w-18" />
                 <SkeletonBlock className="h-1.5 flex-1 rounded-full" />
@@ -46,22 +46,14 @@ export function DashboardLoadingSkeleton() {
           </div>
         </SkeletonCard>
 
-        <div className="flex flex-col gap-3">
-          <SkeletonCard>
-            <SkeletonBlock className="h-3 w-28" />
-            <div className="flex justify-between items-end">
-              <SkeletonBlock className="h-10 w-14" />
-              <SkeletonBlock className="h-6 w-20" />
-            </div>
-            <SkeletonBlock className="h-2 w-full rounded-full" />
-          </SkeletonCard>
-
-          <SkeletonCard>
-            <SkeletonBlock className="h-3 w-28" />
-            {[1, 2, 3].map((i) => (
-              <SkeletonBlock key={i} className="h-4 w-full rounded-full" />
-            ))}
-          </SkeletonCard>
+        <div className="grid grid-cols-2 gap-3">
+          {[1, 2, 3, 4].map((i) => (
+            <SkeletonCard key={i}>
+              <SkeletonBlock className="h-3 w-24" />
+              <SkeletonBlock className="h-6 w-16" />
+              <SkeletonBlock className="h-2 w-full rounded-full" />
+            </SkeletonCard>
+          ))}
         </div>
       </div>
     </div>

@@ -1,10 +1,11 @@
 import type { SignalType, CrowdPulseComponents } from "./types";
 
 const BASE_WEIGHTS = {
-  fearGreed: 0.35,
-  rsi: 0.25,
-  volume: 0.20,
-  longShort: 0.20,
+  fearGreed: 0.25,
+  fundingRate: 0.25,
+  rsi: 0.15,
+  longShort: 0.15,
+  openInterest: 0.20,
 };
 
 /** Clamp value between min and max */
@@ -27,7 +28,7 @@ export function scoreToSignal(score: number): SignalType {
 }
 
 /**
- * Calculate CrowdPulse score from 4 components.
+ * Calculate CrowdPulse score from 5 components.
  * Redistributes weights when components are null.
  */
 export function calculateCrowdPulseScore(components: CrowdPulseComponents): {
@@ -35,32 +36,36 @@ export function calculateCrowdPulseScore(components: CrowdPulseComponents): {
   signal: SignalType;
 } {
   const has = {
-    fearGreed: true, // always available (or we wouldn't call this)
+    fearGreed: true,
+    fundingRate: components.fundingRate !== null,
     rsi: components.avgRsi !== null,
-    volume: components.volumeAnomaly !== null,
     longShort: components.longShortRatio !== null,
+    openInterest: components.openInterest !== null,
   };
 
   const totalAvailable =
     (has.fearGreed ? BASE_WEIGHTS.fearGreed : 0) +
+    (has.fundingRate ? BASE_WEIGHTS.fundingRate : 0) +
     (has.rsi ? BASE_WEIGHTS.rsi : 0) +
-    (has.volume ? BASE_WEIGHTS.volume : 0) +
-    (has.longShort ? BASE_WEIGHTS.longShort : 0);
+    (has.longShort ? BASE_WEIGHTS.longShort : 0) +
+    (has.openInterest ? BASE_WEIGHTS.openInterest : 0);
 
   if (totalAvailable === 0) return { score: null, signal: "NEUTRAL" };
 
   const scale = 1 / totalAvailable;
   let weighted = components.fearGreed * (BASE_WEIGHTS.fearGreed * scale);
 
+  if (has.fundingRate) {
+    weighted += components.fundingRate! * (BASE_WEIGHTS.fundingRate * scale);
+  }
   if (has.rsi) {
     weighted += components.avgRsi! * (BASE_WEIGHTS.rsi * scale);
   }
-  if (has.volume) {
-    const normalizedVol = normalizeToHundred(components.volumeAnomaly!, -50, 50);
-    weighted += normalizedVol * (BASE_WEIGHTS.volume * scale);
-  }
   if (has.longShort) {
     weighted += components.longShortRatio! * (BASE_WEIGHTS.longShort * scale);
+  }
+  if (has.openInterest) {
+    weighted += components.openInterest! * (BASE_WEIGHTS.openInterest * scale);
   }
 
   const score = Math.round(weighted * 100) / 100;

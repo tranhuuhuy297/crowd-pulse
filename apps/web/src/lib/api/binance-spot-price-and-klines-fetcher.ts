@@ -5,12 +5,11 @@ interface BinanceTicker {
   symbol: string;
   lastPrice: string;
   priceChangePercent: string;
-  volume: string;
 }
 
 /**
  * Fetch 24hr ticker data for multiple symbols from Binance spot API.
- * Returns price, 24h change %, and volume per symbol.
+ * Returns price and 24h change % per symbol.
  */
 export async function fetchSpotTickers(symbols: readonly string[]): Promise<PriceSnapshot[]> {
   try {
@@ -24,8 +23,7 @@ export async function fetchSpotTickers(symbols: readonly string[]): Promise<Pric
       symbol: SYMBOL_DISPLAY_NAMES[t.symbol] ?? t.symbol,
       price: parseFloat(t.lastPrice),
       change24hPct: parseFloat(t.priceChangePercent),
-      volume24h: parseFloat(t.volume),
-      rsi: null, // filled in later from klines
+      rsi: null,
     }));
   } catch {
     return [];
@@ -37,19 +35,18 @@ type BinanceKline = [number, string, string, string, string, string, ...unknown[
 
 export interface KlineData {
   closes: number[];
-  volumes: number[];
   highs: number[];
   lows: number[];
 }
 
 /**
  * Fetch kline (candlestick) data for a single symbol.
- * Returns closes, volumes, highs, lows for RSI, volume anomaly, and support/resistance.
+ * Returns closes, highs, lows for RSI and support/resistance.
  */
 export async function fetchKlineClosesAndVolumes(
   symbol: string,
-  interval = "4h",
-  limit = 100,
+  interval = "1d",
+  limit = 30,
 ): Promise<KlineData | null> {
   try {
     const res = await fetch(
@@ -61,7 +58,6 @@ export async function fetchKlineClosesAndVolumes(
 
     return {
       closes: klines.map((k) => parseFloat(k[4])),
-      volumes: klines.map((k) => parseFloat(k[5])),
       highs: klines.map((k) => parseFloat(k[2])),
       lows: klines.map((k) => parseFloat(k[3])),
     };

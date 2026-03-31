@@ -3,30 +3,25 @@ import { InfoTooltip } from "./info-tooltip";
 
 /** Config for each score component: label, weight, color, and value extractor */
 const COMPONENT_CONFIG = [
-  { key: "fearGreed", label: "Mkt Sentiment", weight: 35, color: "bg-amber-500", tooltip: "alternative.me Fear & Greed Index (0-100). 35% weight." },
-  { key: "avgRsi", label: "RSI", weight: 25, color: "bg-neutral-400", tooltip: "Avg RSI across symbols. 25% weight." },
-  { key: "volumeAnomaly", label: "Volume", weight: 20, color: "bg-neutral-500", tooltip: "Current vs avg volume. 20% weight." },
-  { key: "longShortRatio", label: "L/S Ratio", weight: 20, color: "bg-amber-400", tooltip: "Long/short ratio (0-100). 20% weight." },
+  { key: "fearGreed", label: "Mkt Sentiment", weight: 25, color: "bg-amber-500", tooltip: "Fear & Greed Index (0-100). 25% weight." },
+  { key: "fundingRate", label: "Funding Rate", weight: 25, color: "bg-orange-500", tooltip: "8h funding rate normalized. 25% weight." },
+  { key: "avgRsi", label: "RSI", weight: 15, color: "bg-neutral-400", tooltip: "Avg RSI across symbols. 15% weight." },
+  { key: "longShortRatio", label: "L/S Ratio", weight: 15, color: "bg-amber-400", tooltip: "Long/short ratio (0-100). 15% weight." },
+  { key: "openInterest", label: "Open Interest", weight: 20, color: "bg-purple-400", tooltip: "OI vs 14d avg normalized. 20% weight." },
 ] as const;
-
-/** Normalize volume anomaly from raw % (-100..+200 typical) to 0-100 */
-function normalizeVolumeAnomaly(val: number): number {
-  return Math.min(100, Math.max(0, (val + 100) / 3));
-}
 
 /** Get normalized 0-100 value for display */
 function getNormalizedValue(key: string, components: CrowdPulseComponents): number | null {
   const raw = components[key as keyof CrowdPulseComponents];
   if (raw === null) return null;
-  if (key === "volumeAnomaly") return normalizeVolumeAnomaly(raw);
-  return raw; // fearGreed, avgRsi, longShortRatio are already 0-100
+  return raw; // all components are already 0-100
 }
 
 interface Props {
   components: CrowdPulseComponents;
 }
 
-/** 4 mini horizontal progress bars showing each score component's contribution */
+/** 5 mini horizontal progress bars showing each score component's contribution */
 export function ScoreComponentBreakdown({ components }: Props) {
   return (
     <div className="w-full flex flex-col gap-2">

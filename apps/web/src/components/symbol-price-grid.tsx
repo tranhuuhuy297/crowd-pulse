@@ -1,25 +1,8 @@
 import type { PriceSnapshot } from "../lib/types";
 import { formatPrice, formatPercent } from "../lib/number-format-utils";
-import { InfoTooltip } from "./info-tooltip";
 
 interface SymbolPriceGridProps {
   prices: PriceSnapshot[];
-}
-
-/** Returns RSI color class: green if oversold (<30), red if overbought (>70), neutral otherwise */
-function getRsiColor(rsi: number | null): string {
-  if (rsi === null) return "";
-  if (rsi < 30) return "text-green-500";
-  if (rsi > 70) return "text-red-500";
-  return "";
-}
-
-/** Format volume as compact string, e.g. "1.2B" or "450M" */
-function formatVolume(vol: number): string {
-  if (vol >= 1_000_000_000) return `$${(vol / 1_000_000_000).toFixed(1)}B`;
-  if (vol >= 1_000_000) return `$${(vol / 1_000_000).toFixed(1)}M`;
-  if (vol >= 1_000) return `$${(vol / 1_000).toFixed(0)}K`;
-  return `$${vol.toFixed(0)}`;
 }
 
 /** Bitcoin logo SVG icon */
@@ -45,7 +28,6 @@ export function SymbolPriceGrid({ prices }: SymbolPriceGridProps) {
 
   const btc = prices[0]!;
   const isPositive = btc.change24hPct !== null && btc.change24hPct >= 0;
-  const rsiColor = getRsiColor(btc.rsi);
 
   return (
     <div className="flex items-center gap-4 sm:gap-6">
@@ -71,28 +53,6 @@ export function SymbolPriceGrid({ prices }: SymbolPriceGridProps) {
             {isPositive ? "▲" : "▼"} {formatPercent(btc.change24hPct)}
             <span className="font-normal ml-1.5" style={{ color: "var(--text-muted)" }}>24h</span>
           </span>
-        )}
-      </div>
-
-      {/* RSI + Volume stats */}
-      <div className="flex items-center gap-3 ml-auto flex-wrap">
-        {btc.rsi !== null && (
-          <div className="flex flex-col items-center">
-            <span className="text-xs uppercase flex items-center gap-0.5" style={{ color: "var(--text-muted)" }}>
-              RSI
-              <InfoTooltip placement="bottom" content="RSI-14. >70 overbought, <30 oversold." />
-            </span>
-            <span className={`text-sm font-semibold ${rsiColor}`} style={rsiColor ? undefined : { color: "var(--text-secondary)" }}>{btc.rsi.toFixed(1)}</span>
-          </div>
-        )}
-        {btc.volume24h > 0 && (
-          <div className="flex flex-col items-center">
-            <span className="text-xs uppercase flex items-center gap-0.5" style={{ color: "var(--text-muted)" }}>
-              Volume
-              <InfoTooltip placement="bottom" content="24h spot volume from Binance." />
-            </span>
-            <span className="text-sm font-semibold" style={{ color: "var(--text-secondary)" }}>{formatVolume(btc.volume24h)}</span>
-          </div>
         )}
       </div>
     </div>
