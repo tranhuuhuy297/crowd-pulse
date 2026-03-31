@@ -32,10 +32,10 @@ export function TopTraderAndTakerDisplayCard({ topTrader, takerBuySell, classNam
   const tkBadge = tk ? sentimentBadge(tk.buySellRatio, TOP_TRADER_RATIO_TIERS) : null;
 
   return (
-    <DashboardCard className={`flex flex-col gap-3 ${className}`}>
+    <DashboardCard className={`flex flex-col gap-5 ${className}`}>
       {/* Top Trader L/S */}
       {tt && ttBadge && (
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-semibold uppercase tracking-wider flex items-center gap-1" style={{ color: "var(--text-muted)" }}>
               Top Traders
@@ -59,9 +59,14 @@ export function TopTraderAndTakerDisplayCard({ topTrader, takerBuySell, classNam
         </div>
       )}
 
+      {/* Divider between sections */}
+      {tt && ttBadge && tk && tkBadge && (
+        <hr className="border-t" style={{ borderColor: "var(--border)" }} />
+      )}
+
       {/* Taker Buy/Sell */}
       {tk && tkBadge && (
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-semibold uppercase tracking-wider flex items-center gap-1" style={{ color: "var(--text-muted)" }}>
               Taker Buy/Sell

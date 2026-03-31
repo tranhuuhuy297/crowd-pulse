@@ -63,7 +63,6 @@ export function MarketPulseSummaryBar({ data }: Props) {
         <span
           key={chip.key}
           className={`text-xs font-bold px-2 py-0.5 rounded-full border ${chip.badge.classes}`}
-          style={{ color: "var(--text-primary)" }}
         >
           {chip.label}: {chip.value}
         </span>
