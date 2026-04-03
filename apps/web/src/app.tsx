@@ -10,7 +10,6 @@ import { FuturesBasisDisplayCard } from "./components/futures-basis-display-card
 import { TopTraderAndTakerDisplayCard } from "./components/top-trader-and-taker-display-card";
 import { SymbolPriceGrid } from "./components/symbol-price-grid";
 import { BuyConclusionDisplayCard } from "./components/buy-conclusion-display-card";
-import { MarketPulseSummaryBar } from "./components/market-pulse-summary-bar";
 import { DashboardCard } from "./components/dashboard-card";
 import { DashboardLoadingSkeleton } from "./components/dashboard-loading-skeleton";
 import { ThemeToggleButton } from "./components/theme-toggle-button";
@@ -55,7 +54,6 @@ function AssetDashboard() {
         <span className="text-sm font-bold tracking-tight shrink-0" style={{ color: "var(--accent)" }}>
           CrowdPulse
         </span>
-        {data && assetData && <MarketPulseSummaryBar asset={assetData} fearGreed={data.fearGreed} />}
         <div className="flex items-center gap-2 ml-auto shrink-0">
           {data && (
             <>
