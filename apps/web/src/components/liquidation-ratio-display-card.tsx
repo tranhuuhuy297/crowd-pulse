@@ -61,16 +61,16 @@ export function LiquidationRatioDisplayCard({ longShort, className = "" }: Props
       {/* Stacked long/short bar */}
       <div className="flex h-5 rounded-full overflow-hidden text-xs font-bold">
         <div
-          className="bg-green-500 flex items-center justify-center text-white transition-all duration-500"
+          className="bg-emerald-500 flex items-center justify-center text-white transition-all duration-500"
           style={{ width: `${Math.max(longPct, 12)}%` }}
         >
-          {longPct.toFixed(0)}% L
+          {longPct.toFixed(0)}% Long
         </div>
         <div
-          className="bg-red-500 flex items-center justify-center text-white transition-all duration-500"
+          className="bg-rose-500 flex items-center justify-center text-white transition-all duration-500"
           style={{ width: `${Math.max(shortPct, 12)}%` }}
         >
-          {shortPct.toFixed(0)}% S
+          {shortPct.toFixed(0)}% Short
         </div>
       </div>
     </DashboardCard>

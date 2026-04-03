@@ -7,11 +7,11 @@ interface GaugeChartProps {
 
 /** Returns arc color based on score bucket — green (fear/buy) to red (greed/sell) */
 function getArcColor(score: number): string {
-  if (score <= 20) return "#22c55e"; // green-500 — extreme fear
-  if (score <= 40) return "#4ade80"; // green-400 — fear
+  if (score <= 20) return "#10b981"; // emerald-500 — extreme fear
+  if (score <= 40) return "#34d399"; // emerald-400 — fear
   if (score <= 60) return "#a3a3a3"; // neutral-400 — neutral
-  if (score <= 80) return "#f87171"; // red-400 — greed
-  return "#ef4444"; // red-500 — extreme greed
+  if (score <= 80) return "#fb7185"; // rose-400 — greed
+  return "#f43f5e"; // rose-500 — extreme greed
 }
 
 /** SVG semicircle gauge showing score 0-100 with colored arc and needle */

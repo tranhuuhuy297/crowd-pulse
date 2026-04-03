@@ -16,11 +16,11 @@ const RECOMMENDATION_CONFIG: Record<BuyConclusionData["recommendation"], {
 }> = {
   BUY_NOW: {
     label: "BUY NOW",
-    labelColor: "text-green-700 dark:text-green-400",
-    borderColor: "rgba(34, 197, 94, 0.35)",
-    glowShadow: "0 0 20px rgba(34,197,94,0.2), 0 0 40px rgba(34,197,94,0.08)",
-    bgGradient: "radial-gradient(ellipse at left, rgba(34,197,94,0.1), transparent 50%)",
-    accentRgb: "34, 197, 94",
+    labelColor: "text-emerald-700 dark:text-emerald-400",
+    borderColor: "rgba(16, 185, 129, 0.35)",
+    glowShadow: "0 0 20px rgba(16,185,129,0.2), 0 0 40px rgba(16,185,129,0.08)",
+    bgGradient: "radial-gradient(ellipse at left, rgba(16,185,129,0.1), transparent 50%)",
+    accentRgb: "16, 185, 129",
   },
   WAIT_FOR_DIP: {
     label: "WAIT FOR DIP",
@@ -40,11 +40,11 @@ const RECOMMENDATION_CONFIG: Record<BuyConclusionData["recommendation"], {
   },
   AVOID: {
     label: "AVOID",
-    labelColor: "text-red-700 dark:text-red-400",
-    borderColor: "rgba(239, 68, 68, 0.3)",
-    glowShadow: "0 0 20px rgba(239,68,68,0.15), 0 0 40px rgba(239,68,68,0.06)",
-    bgGradient: "radial-gradient(ellipse at left, rgba(239,68,68,0.08), transparent 50%)",
-    accentRgb: "239, 68, 68",
+    labelColor: "text-rose-700 dark:text-rose-400",
+    borderColor: "rgba(244, 63, 94, 0.3)",
+    glowShadow: "0 0 20px rgba(244,63,94,0.15), 0 0 40px rgba(244,63,94,0.06)",
+    bgGradient: "radial-gradient(ellipse at left, rgba(244,63,94,0.08), transparent 50%)",
+    accentRgb: "244, 63, 94",
   },
 };
 

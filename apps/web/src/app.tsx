@@ -20,9 +20,9 @@ import type { DataSourceHealth } from "./lib/types";
 /** Health dot: green = all OK, yellow = some failed, red = most failed */
 function healthDotColor(health: DataSourceHealth): string {
   const ok = [health.fearGreed, health.prices, health.klines, health.longShort, health.fundingRate, health.openInterest].filter(Boolean).length;
-  if (ok === 6) return "bg-green-500";
+  if (ok === 6) return "bg-emerald-500";
   if (ok >= 3) return "bg-amber-500 animate-pulse";
-  return "bg-red-500 animate-pulse";
+  return "bg-rose-500 animate-pulse";
 }
 
 function failedSources(health: DataSourceHealth): string[] {
@@ -80,7 +80,7 @@ function AssetDashboard() {
 
         {error && !data && (
           <div className="flex flex-col items-center gap-3 py-20 text-center">
-            <p className="text-red-500 font-semibold">Failed to load dashboard</p>
+            <p className="text-rose-500 font-semibold">Failed to load dashboard</p>
             <p className="text-sm" style={{ color: "var(--text-muted)" }}>{error}</p>
           </div>
         )}

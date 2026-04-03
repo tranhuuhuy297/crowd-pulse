@@ -12,11 +12,11 @@ interface FearGreedDisplayCardProps {
 
 /** Returns progress bar color — green (fear) to red (greed) */
 function getBarColor(value: number): string {
-  if (value <= 25) return "bg-green-500";
-  if (value <= 45) return "bg-green-400";
+  if (value <= 25) return "bg-emerald-500";
+  if (value <= 45) return "bg-emerald-400";
   if (value <= 55) return "bg-neutral-400";
-  if (value <= 75) return "bg-red-400";
-  return "bg-red-500";
+  if (value <= 75) return "bg-rose-400";
+  return "bg-rose-500";
 }
 
 /** Compact Fear & Greed index card */
@@ -40,7 +40,7 @@ export function FearGreedDisplayCard({ value, classification, change24h, classNa
         <div className="text-right">
           <p className={`text-lg font-semibold ${valueColor}`}>{classification}</p>
           {change24h !== null && (
-            <p className={`text-xs ${isPositiveChange ? "text-green-500" : "text-red-500"}`}>
+            <p className={`text-xs ${isPositiveChange ? "text-emerald-500" : "text-rose-500"}`}>
               {isPositiveChange ? "▲" : "▼"} {formatPercent(Math.abs(change24h))} 24h
             </p>
           )}

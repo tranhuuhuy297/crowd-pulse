@@ -109,7 +109,7 @@ function AnimatedPrice({ price, className }: { price: number; className?: string
 
   useEffect(() => {
     if (prevPrice.current !== price && spanRef.current) {
-      const flash = price > prevPrice.current ? "text-green-400" : "text-red-400";
+      const flash = price > prevPrice.current ? "text-emerald-400" : "text-rose-400";
       spanRef.current.classList.add(flash);
       const timeout = setTimeout(() => spanRef.current?.classList.remove(flash), 600);
       prevPrice.current = price;
@@ -129,10 +129,10 @@ function AnimatedPrice({ price, className }: { price: number; className?: string
 
 /** Short labels for pill chips */
 const BUY_CHIP_SHORT: Record<BuyConclusionData["recommendation"], { label: string; color: string }> = {
-  BUY_NOW: { label: "Buy", color: "rgb(34, 197, 94)" },
+  BUY_NOW: { label: "Buy", color: "rgb(16, 185, 129)" },
   WAIT_FOR_DIP: { label: "Wait", color: "rgb(245, 158, 11)" },
   HOLD_OFF: { label: "Hold", color: "rgb(163, 163, 163)" },
-  AVOID: { label: "Avoid", color: "rgb(239, 68, 68)" },
+  AVOID: { label: "Avoid", color: "rgb(244, 63, 94)" },
 };
 
 function AssetPill({ displayName, price, isActive, onClick, recommendation }: {
@@ -179,7 +179,7 @@ function AssetPill({ displayName, price, isActive, onClick, recommendation }: {
             </span>
           )}
         </div>
-        <span className={`text-xs leading-tight ${isPositive ? "text-green-500" : "text-red-500"}`}>
+        <span className={`text-xs leading-tight ${isPositive ? "text-emerald-500" : "text-rose-500"}`}>
           {isPositive ? "+" : ""}{price.change24hPct.toFixed(1)}%
         </span>
       </div>
@@ -233,7 +233,7 @@ export function SymbolPriceGrid({ prices, selectedAsset, onAssetChange, buyRecom
               {(() => {
                 const isPositive = selected.change24hPct >= 0;
                 return (
-                  <span className={`text-sm font-semibold ${isPositive ? "text-green-500" : "text-red-500"}`}>
+                  <span className={`text-sm font-semibold ${isPositive ? "text-emerald-500" : "text-rose-500"}`}>
                     {isPositive ? "▲" : "▼"} {formatPercent(selected.change24hPct)}
                     <span className="font-normal ml-1" style={{ color: "var(--text-muted)" }}>24h</span>
                   </span>

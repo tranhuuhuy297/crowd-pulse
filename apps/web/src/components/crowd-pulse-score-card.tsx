@@ -13,11 +13,11 @@ interface CrowdPulseScoreCardProps {
 }
 
 const SIGNAL_STYLES: Record<SignalType, { badge: string; label: string }> = {
-  STRONG_BUY: { badge: "bg-green-500/20 text-green-700 dark:text-green-400 border-green-500/30",    label: "Strong Buy" },
-  BUY:        { badge: "bg-green-500/15 text-green-700 dark:text-green-400 border-green-500/20",    label: "Buy" },
+  STRONG_BUY: { badge: "bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border-emerald-500/30",    label: "Strong Buy" },
+  BUY:        { badge: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/20",    label: "Buy" },
   NEUTRAL:    { badge: "bg-neutral-500/20 text-neutral-700 dark:text-neutral-400 border-neutral-500/30", label: "Neutral" },
-  SELL:       { badge: "bg-red-500/15 text-red-700 dark:text-red-400 border-red-500/20",          label: "Sell" },
-  STRONG_SELL:{ badge: "bg-red-500/20 text-red-700 dark:text-red-400 border-red-500/30",          label: "Strong Sell" },
+  SELL:       { badge: "bg-rose-500/15 text-rose-700 dark:text-rose-400 border-rose-500/20",          label: "Sell" },
+  STRONG_SELL:{ badge: "bg-rose-500/20 text-rose-700 dark:text-rose-400 border-rose-500/30",          label: "Strong Sell" },
 };
 
 const CONTRARIAN_MESSAGES: Record<SignalType, string> = {
@@ -29,11 +29,11 @@ const CONTRARIAN_MESSAGES: Record<SignalType, string> = {
 };
 
 const SIGNAL_BANNER: Record<SignalType, string> = {
-  STRONG_BUY:  "bg-green-500/10 border-green-500/20",
-  BUY:         "bg-green-500/8 border-green-500/15",
+  STRONG_BUY:  "bg-emerald-500/10 border-emerald-500/20",
+  BUY:         "bg-emerald-500/8 border-emerald-500/15",
   NEUTRAL:     "bg-neutral-500/10 border-neutral-500/20",
-  SELL:        "bg-red-500/8 border-red-500/15",
-  STRONG_SELL: "bg-red-500/10 border-red-500/20",
+  SELL:        "bg-rose-500/8 border-rose-500/15",
+  STRONG_SELL: "bg-rose-500/10 border-rose-500/20",
 };
 
 /** Compact score card with gauge, delta, contrarian banner, and breakdown */
@@ -62,7 +62,7 @@ export function CrowdPulseScoreCard({ score, signal, components, scoreDelta }: C
         <>
           <SvgGaugeChart score={score} size={170} />
           {scoreDelta !== null && (
-            <span className={`text-xs font-semibold ${scoreDelta >= 0 ? "text-red-500" : "text-green-500"}`}>
+            <span className={`text-xs font-semibold ${scoreDelta >= 0 ? "text-rose-500" : "text-emerald-500"}`}>
               {scoreDelta >= 0 ? "▲" : "▼"} {Math.abs(scoreDelta).toFixed(1)}
             </span>
           )}

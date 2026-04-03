@@ -49,11 +49,11 @@ export function TopTraderAndTakerDisplayCard({ topTrader, takerBuySell, classNam
             {tt.ratio.toFixed(2)}
           </div>
           <div className="flex h-5 rounded-full overflow-hidden text-xs font-bold">
-            <div className="bg-green-500 flex items-center justify-center text-white transition-all duration-500" style={{ width: `${Math.max(tt.longPct, 12)}%` }}>
-              {tt.longPct.toFixed(0)}% L
+            <div className="bg-emerald-500 flex items-center justify-center text-white transition-all duration-500" style={{ width: `${Math.max(tt.longPct, 12)}%` }}>
+              {tt.longPct.toFixed(0)}% Long
             </div>
-            <div className="bg-red-500 flex items-center justify-center text-white transition-all duration-500" style={{ width: `${Math.max(tt.shortPct, 12)}%` }}>
-              {tt.shortPct.toFixed(0)}% S
+            <div className="bg-rose-500 flex items-center justify-center text-white transition-all duration-500" style={{ width: `${Math.max(tt.shortPct, 12)}%` }}>
+              {tt.shortPct.toFixed(0)}% Short
             </div>
           </div>
         </div>
@@ -86,10 +86,10 @@ export function TopTraderAndTakerDisplayCard({ topTrader, takerBuySell, classNam
             const sellPct = 100 - buyPct;
             return (
               <div className="flex h-5 rounded-full overflow-hidden text-xs font-bold">
-                <div className="bg-green-500 flex items-center justify-center text-white transition-all duration-500" style={{ width: `${Math.max(buyPct, 12)}%` }}>
+                <div className="bg-emerald-500 flex items-center justify-center text-white transition-all duration-500" style={{ width: `${Math.max(buyPct, 12)}%` }}>
                   {buyPct.toFixed(0)}% Buy
                 </div>
-                <div className="bg-red-500 flex items-center justify-center text-white transition-all duration-500" style={{ width: `${Math.max(sellPct, 12)}%` }}>
+                <div className="bg-rose-500 flex items-center justify-center text-white transition-all duration-500" style={{ width: `${Math.max(sellPct, 12)}%` }}>
                   {sellPct.toFixed(0)}% Sell
                 </div>
               </div>
