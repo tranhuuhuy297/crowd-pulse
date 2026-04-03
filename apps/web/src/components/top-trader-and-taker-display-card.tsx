@@ -9,7 +9,7 @@ interface Props {
   className?: string;
 }
 
-const TOP_TOOLTIP = "Top traders' positions. Divergence from crowd = strong contrarian signal.";
+const TOP_TOOLTIP = "Top trader long vs short positions. >1 = more longs than shorts.";
 const TAKER_TOOLTIP = "Taker buy vs sell volume. >1 = aggressive buying.";
 
 /** Combined card showing top trader L/S and taker buy/sell ratio */
